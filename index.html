@@ -6,18 +6,16 @@
     <title>Brasil Simulator - Clicker Político</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-<div  class="bodi">
+<div class="bodi">
+
     <!-- ===================== TELA INICIAL (SPLASH) ===================== -->
     <div id="splash-screen" class="screen splash-bg">
         <canvas id="particles-canvas"></canvas>
-
         <div class="splash-content">
-            <!-- Logo animado -->
             <div class="splash-logo-wrap">
                 <div class="splash-flag-stripe red"></div>
                 <div class="splash-flag-stripe green"></div>
@@ -28,130 +26,87 @@
                 </h1>
                 <div class="splash-subtitle">O jogo político mais corrupto do Brasil 🇧🇷</div>
             </div>
-
-            <!-- Estatísticas rápidas de apresentação -->
             <div class="splash-stats-row">
-                <div class="splash-stat-card">
-                    <div class="splash-stat-icon">🏛️</div>
-                    <div class="splash-stat-label">Gerencie o País</div>
-                </div>
-                <div class="splash-stat-card">
-                    <div class="splash-stat-icon">💰</div>
-                    <div class="splash-stat-label">Acumule Riqueza</div>
-                </div>
-                <div class="splash-stat-card">
-                    <div class="splash-stat-icon">🏆</div>
-                    <div class="splash-stat-label">Ranking Global</div>
-                </div>
-                <div class="splash-stat-card">
-                    <div class="splash-stat-icon">⚔️</div>
-                    <div class="splash-stat-label">Sabote Rivais</div>
-                </div>
+                <div class="splash-stat-card"><div class="splash-stat-icon">🏛️</div><div class="splash-stat-label">Gerencie o País</div></div>
+                <div class="splash-stat-card"><div class="splash-stat-icon">💰</div><div class="splash-stat-label">Acumule Riqueza</div></div>
+                <div class="splash-stat-card"><div class="splash-stat-icon">🏆</div><div class="splash-stat-label">Ranking Global</div></div>
+                <div class="splash-stat-card"><div class="splash-stat-icon">⚔️</div><div class="splash-stat-label">Sabote Rivais</div></div>
             </div>
-
-            <!-- Botão START principal -->
             <button class="btn-start-game" onclick="openAuthModal()">
                 <span class="btn-start-icon">▶</span> INICIAR JOGO
             </button>
-
             <p class="splash-hint">Faça login ou registre-se para salvar seu progresso</p>
-
-            <!-- Botão jogar como convidado -->
             <button class="btn-guest" onclick="playAsGuest()">Jogar como Convidado (sem salvar)</button>
         </div>
-
-        <!-- Versão e créditos -->
-        <div class="splash-footer">v1.2 · Brasil Simulator · 2025</div>
+        <div class="splash-footer">v2.0 · Brasil Simulator · 2025</div>
     </div>
 
     <!-- ===================== MODAL DE LOGIN / REGISTRO ===================== -->
     <div id="auth-modal" class="modal-overlay hidden" onclick="closeAuthModal(event)">
         <div class="auth-modal-box" onclick="event.stopPropagation()">
-            <!-- Abas -->
             <div class="auth-tabs">
                 <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">ENTRAR</button>
                 <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">REGISTRAR</button>
             </div>
-
             <div class="auth-modal-body">
                 <div class="auth-modal-icon">🏛️</div>
                 <h2 class="auth-modal-title" id="auth-modal-title">Bem-vindo de volta!</h2>
                 <p class="auth-modal-desc" id="auth-modal-desc">Entre com sua conta para continuar sua jornada política.</p>
-
                 <div class="form-group">
                     <input type="text" id="username-input" placeholder="Nome de Usuário" maxlength="15" autocomplete="off">
                     <input type="password" id="password-input" placeholder="Senha" autocomplete="off">
                 </div>
-
                 <button class="btn-auth-confirm" id="btn-auth-confirm" onclick="confirmAuth()">
                     <span id="btn-auth-text">ENTRAR NO JOGO</span>
                 </button>
-
                 <p id="auth-message" class="message"></p>
             </div>
-
             <button class="auth-modal-close" onclick="closeAuthModal()">✕</button>
         </div>
     </div>
 
     <!-- ===================== TELA DO JOGO ===================== -->
     <div id="game-screen" class="screen hidden">
-        
-        
-        
-        
-            <div class="row">
-                <div class="col-md-4">
-                        <div style=" margin: 10px auto; padding: 0; display: flex; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div id="tab-crise" style="background: #1a0d0d; border: 2px solid #ff3333; padding: 12px; border-radius: 6px; text-align: center;">
-                <p style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #fff; font-weight: bold; margin-bottom: 5px;">⚠️ GABINETE DE CRISE: Nível de Escândalo</p>
-                <div style="width: 100%; background: #331111; height: 15px; border-radius: 4px; margin-bottom: 10px; overflow: hidden; border: 1px solid #ff3333;">
-                    <div id="barra-escandalo" style="width: 25%; background: linear-gradient(90deg, #ff9900, #ff3333); height: 100%; transition: width 0.5s;"></div>
-                </div>
-                <p style="font-size: 9px; color: #b37373; line-height: 1.4; margin-bottom: 12px;">Se atingir 100%, seus bens serão congelados pelo STF por 1 minuto!</p>
-                <button class="ranking-toggle-btn" style="background: #ff3333; color: #fff; font-weight: bold; width: 100%; padding: 6px; font-size: 10px;" onclick="abafarCaso()">ABAFAR CASO (-R$ 1.500)</button>
-            </div>
-                </div>
 
-                           
+        <!-- TOPO: 3 COLUNAS -->
+        <div class="top-row">
+
+            <!-- GABINETE DE CRISE -->
+            <div class="top-panel crisis-panel" id="tab-crise">
+                <p class="panel-title">⚠️ GABINETE DE CRISE</p>
+                <p class="panel-subtitle">Nível de Escândalo</p>
+                <div class="scandal-bar-wrap">
+                    <div id="barra-escandalo" class="scandal-bar-fill" style="width:25%"></div>
                 </div>
-                <div class="col-md-4">
-                    <div class="top-status-panel">
-                     <div class="main-currency">R$ <span id="stat-money">0</span></div>
-                            <div class="prestige-level">Prestige: <span id="stat-prestige">1</span> <small style="font-size:10px; color:#00ff66;">(+<span id="stat-prestige-bonus">0</span>% Lucro)</small></div>
-                            <div class="player-name" id="display-username">Convidado</div>
-                            </div>
-                            <div id="event-ticker" class="ticker-hidden">Aguardando relatórios econômicos...</div>
-                </div>
-                <div class="col-md-4">
-                        <div style=" background: #141419; border: 2px solid #444; padding: 12px; border-radius: 6px; display: flex; flex-direction: column; justify-content: center; gap: 8px;">
-                <p style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #fff; text-align: center; margin: 0;">MEDIDAS ESTRATÉGICAS</p>
-                <div class="quick-actions-panel" style="display: flex; flex-direction: column; gap: 6px;">
-                    <div class="row g-2">
-                        <div class="d-flex justify-content-center">
-                            <button id="btn-pedir-vista" class="ranking-toggle-btn" style="background: #e6b800; color: #000; font-weight: bold; font-size: 9px; padding: 8px; width: 100%;" onclick="ativarPedirVista()">⚖️ PEDIR VISTA (PRONTO)</button>
-                        </div>
-                        <div class="d-flex justify-content-center">
-                            <button id="btn-mala-falsa" class="ranking-toggle-btn" style="background: #595959; color: #fff; font-size: 9px; padding: 8px; width: 100%;" onclick="comprarMalaFalsa()">💼 MALA FALSA (R$ 1.100)</button>
-                        </div> 
-                    </div>
-                    <div class="d-flex justify-content-center">
-                        <button id="prestige-trigger-btn" style="width: 100%;" onclick="triggerPrestige()">PRESTIGE</button>
-                    </div>
+                <p class="panel-hint">100% = STF congela bens por 60s!</p>
+                <div class="crisis-btns">
+                    <button class="game-btn btn-red" onclick="abafarCaso()">🧹 ABAFAR (-R$ 1.500)</button>
+                    <button class="game-btn btn-orange" onclick="contratarLobbysta()">🤝 LOBBYSTA (-R$ 4.000)</button>
                 </div>
             </div>
+
+            <!-- PAINEL CENTRAL: DINHEIRO E STATUS -->
+            <div class="top-panel status-panel">
+                <div class="main-currency">R$ <span id="stat-money">0</span></div>
+                <div class="rps-display">R$ <span id="stat-rps">0</span>/s</div>
+                <div class="prestige-level">Prestige: <span id="stat-prestige">1</span> <small>(+<span id="stat-prestige-bonus">0</span>% Lucro)</small></div>
+                <div class="player-name" id="display-username">Convidado</div>
+                <div id="event-ticker" class="ticker-hidden">Aguardando relatórios econômicos...</div>
+            </div>
+
+            <!-- MEDIDAS ESTRATÉGICAS -->
+            <div class="top-panel strategy-panel">
+                <p class="panel-title">MEDIDAS ESTRATÉGICAS</p>
+                <div class="strategy-grid">
+                    <button id="btn-pedir-vista" class="game-btn btn-yellow" onclick="ativarPedirVista()">⚖️ PEDIR VISTA <span class="cooldown-tag" id="cd-vista">PRONTO</span></button>
+                    <button id="btn-mala-falsa" class="game-btn btn-gray" onclick="comprarMalaFalsa()">💼 MALA FALSA <span class="cooldown-tag">R$ 1.100</span></button>
+                    <button id="btn-offshore" class="game-btn btn-teal" onclick="abrirOffshore()">🏝️ OFFSHORE <span class="cooldown-tag">R$ 8.000</span></button>
+                    <button id="btn-laranjas" class="game-btn btn-orange" onclick="usarLaranjas()">🍊 LARANJAS <span class="cooldown-tag" id="cd-laranjas">PRONTO</span></button>
+                    <button id="btn-emenda" class="game-btn btn-blue" onclick="emendaPix()">💳 EMENDA PIX <span class="cooldown-tag" id="cd-emenda">PRONTO</span></button>
+                    <button id="prestige-trigger-btn" class="game-btn btn-purple" onclick="triggerPrestige()">⭐ PRESTIGE</button>
                 </div>
             </div>
-         
-
-             <!-- PAINÉIS DE GABINETE E MEDIDAS -->
-       
-   
-        
-
-
-        <!-- NOTIFICAÇÃO FLUTUANTE DE GANHOS -->
-        <div id="float-notif" class="float-notif hidden"></div>
+        </div>
 
         <!-- BARRA DE MISSÃO DIÁRIA -->
         <div id="daily-mission-bar" class="daily-mission-bar">
@@ -159,63 +114,187 @@
             <div class="daily-progress-outer"><div id="daily-progress-inner" class="daily-progress-inner" style="width:0%"></div></div>
             <span id="daily-mission-reward" class="daily-reward-label">+R$ 5.000</span>
         </div>
-       
 
+        <!-- NOTIFICAÇÃO FLUTUANTE -->
+        <div id="float-notif" class="float-notif hidden"></div>
+
+        <!-- LAYOUT PRINCIPAL DO JOGO -->
         <div class="game-main-layout">
-            
+
+            <!-- COLUNA ESQUERDA: PROGRAMAS SOCIAIS -->
             <div class="items-column-scroll">
+                <div class="column-header">📦 PROGRAMAS SOCIAIS</div>
                 <div id="left-items-container"></div>
             </div>
 
+            <!-- ÁREA CENTRAL -->
             <div class="center-area">
-                <!-- BOTÃO CENTRAL DE CLIQUE -->
                 <div class="central-bank-btn" onclick="mainClickBoost()" id="central-btn">
                     <div class="bank-icon">🏛️</div>
                     <div class="click-ripple" id="click-ripple"></div>
                 </div>
                 <div class="click-info">Clique rende: R$ <span id="stat-click-power">1</span></div>
-
-                <!-- COMBO MULTIPLIER -->
                 <div id="combo-display" class="combo-display hidden">🔥 COMBO x<span id="combo-count">1</span></div>
 
-                <button id="btn-monofone" class="ranking-toggle-btn" style="background: #00ffff; color: #000; font-weight: bold; width: 100%; margin-bottom: 10px; font-size: 9px;" onclick="ativarMonofone()">📞 ATIVAR GRAMPO <br>(ROUBAR RIVAIS)</button>
-
-                <button class="ranking-toggle-btn" onclick="toggleRankingModal()">🏆 RANKING GLOBAL</button>
-
-                <!-- BOTÃO DE MISSÕES DIÁRIAS -->
-                <button class="ranking-toggle-btn btn-missions" onclick="toggleMissionsModal()">🎯 MISSÕES</button>
-
-                <!-- BOTÃO DE CONQUISTAS -->
-                <button class="ranking-toggle-btn btn-achievements" onclick="toggleAchievementsModal()">🏅 CONQUISTAS</button>
-
+                <!-- AÇÕES CENTRAIS -->
+                <button id="btn-monofone" class="game-btn btn-cyan full-w" onclick="ativarMonofone()">📞 GRAMPO <span class="cooldown-tag" id="cd-monofone">PRONTO</span></button>
+                <button id="btn-denuncia" class="game-btn btn-red full-w" onclick="executarSabotagem('corregedoria', 3200)">🚨 DENUNCIAR RIVAL (R$ 3.200)</button>
+                <button class="game-btn btn-gold full-w" onclick="toggleRankingModal()">🏆 RANKING GLOBAL</button>
+                <button class="game-btn btn-purple full-w" onclick="toggleMissionsModal()">🎯 MISSÕES</button>
+                <button class="game-btn btn-green full-w" onclick="toggleAchievementsModal()">🏅 CONQUISTAS</button>
+                <button class="game-btn btn-teal full-w" onclick="toggleStoreModal()">🛒 LOJA ESPECIAL</button>
+                <button class="game-btn btn-blue full-w" onclick="toggleStatsModal()">📊 ESTATÍSTICAS</button>
                 <button class="logout-btn" onclick="logout()">Sair e Salvar</button>
             </div>
 
+            <!-- COLUNA DIREITA: INFRAESTRUTURA -->
             <div class="items-column-scroll">
-                <div class="upgrade-box" style="border-color: #ff3366; background: #1a0813; margin-bottom: 15px; padding: 10px; border-radius: 6px; border: 2px solid #ff3366;">
-                    <div class="box-header" style="display: flex; gap: 10px; align-items: center;">
-                        <div class="item-icon-frame" style="border: 1px solid #ff3366; padding: 5px; font-size: 20px;">🚨</div>
-                        <div class="item-meta">
-                            <div class="title-row"><span class="item-title" style="color: #ff3366; font-family: 'Press Start 2P'; font-size: 8px;">Denúncia à Corregedoria</span></div>
-                            <div style="font-size: 8px; color: #aaa; margin: 4px 0;">Custo: R$ 3.200</div>
-                            <div class="perk-text" style="color: #ccf; font-size: 8px; line-height: 1.2;">Sabota um rival jogando +40% de Escândalo na barra dele.</div>
-                        </div>
-                    </div>
-                    <div class="box-footer" style="margin-top: 8px;"><button style="background: #ff3366; color: #fff; width: 100%; border: none; font-family: 'Press Start 2P'; font-size: 8px; padding: 6px; cursor: pointer;" onclick="executarSabotagem('corregedoria', 3200)">DENUNCIAR RIVAL</button></div>
-                </div>
-
+                <div class="column-header">🏗️ INFRAESTRUTURA</div>
                 <div id="right-items-container"></div>
             </div>
-
         </div>
 
-       
+    </div><!-- fim game-screen -->
+
+    <!-- ===================== PAINEL ADMIN ===================== -->
+    <div id="admin-panel" class="modal-overlay hidden" onclick="closeAdminPanel(event)">
+        <div class="admin-modal" onclick="event.stopPropagation()">
+            <div class="admin-header">
+                <span>🔐 PAINEL DO ADMINISTRADOR</span>
+                <button class="auth-modal-close" onclick="closeAdminPanel()">✕</button>
+            </div>
+            <div class="admin-body">
+
+                <!-- SELEÇÃO DE ALVO -->
+                <div class="admin-section">
+                    <p class="admin-section-title">🎯 SELECIONAR ALVO</p>
+                    <div class="admin-target-row">
+                        <select id="admin-target-select" class="admin-select">
+                            <option value="ALL">👥 TODOS OS JOGADORES</option>
+                        </select>
+                        <button class="game-btn btn-blue" onclick="refreshAdminPlayerList()">🔄 Atualizar</button>
+                    </div>
+                </div>
+
+                <!-- SABOTAGENS -->
+                <div class="admin-section">
+                    <p class="admin-section-title">⚔️ SABOTAGENS</p>
+                    <div class="admin-actions-grid">
+                        <button class="admin-action-btn btn-red" onclick="adminAction('scandal_max')">
+                            🚨 Escândalo 100%
+                            <span>Lota a barra de escândalo</span>
+                        </button>
+                        <button class="admin-action-btn btn-red" onclick="adminAction('freeze_60')">
+                            🧊 Congelar 60s
+                            <span>Bloqueia cliques e produção</span>
+                        </button>
+                        <button class="admin-action-btn btn-red" onclick="adminAction('freeze_120')">
+                            🧊 Congelar 120s
+                            <span>Bloqueio longo</span>
+                        </button>
+                        <button class="admin-action-btn btn-orange" onclick="adminAction('steal_half')">
+                            💸 Roubar 50% do dinheiro
+                            <span>Transfere metade para o banco</span>
+                        </button>
+                        <button class="admin-action-btn btn-orange" onclick="adminAction('steal_all')">
+                            💀 Roubar TUDO
+                            <span>Zera o dinheiro do jogador</span>
+                        </button>
+                        <button class="admin-action-btn btn-orange" onclick="adminAction('reset_items')">
+                            🗑️ Resetar Programas
+                            <span>Remove todos os itens comprados</span>
+                        </button>
+                        <button class="admin-action-btn btn-yellow" onclick="adminAction('scandal_plus50')">
+                            📰 +50% Escândalo
+                            <span>Aumenta escândalo em 50 pontos</span>
+                        </button>
+                        <button class="admin-action-btn btn-yellow" onclick="adminAction('scandal_plus25')">
+                            📰 +25% Escândalo
+                            <span>Aumenta escândalo em 25 pontos</span>
+                        </button>
+                        <button class="admin-action-btn btn-purple" onclick="adminAction('reverse_prestige')">
+                            ⬇️ Reduzir Prestige
+                            <span>Remove 1 nível de prestige</span>
+                        </button>
+                        <button class="admin-action-btn btn-purple" onclick="adminAction('cost_double')">
+                            💹 Dobrar Custos
+                            <span>Duplica o custo de tudo por 60s</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BÔNUS -->
+                <div class="admin-section">
+                    <p class="admin-section-title">🎁 BÔNUS / EVENTOS</p>
+                    <div class="admin-actions-grid">
+                        <button class="admin-action-btn btn-green" onclick="adminAction('bonus_money_10k')">
+                            💰 Dar R$ 10.000
+                            <span>Presente ao jogador</span>
+                        </button>
+                        <button class="admin-action-btn btn-green" onclick="adminAction('bonus_money_100k')">
+                            💰 Dar R$ 100.000
+                            <span>Grande presente</span>
+                        </button>
+                        <button class="admin-action-btn btn-green" onclick="adminAction('bonus_mult2')">
+                            🚀 Multiplicador x2 (30s)
+                            <span>Dobra produção por 30s</span>
+                        </button>
+                        <button class="admin-action-btn btn-green" onclick="adminAction('bonus_mult5')">
+                            🚀 Multiplicador x5 (30s)
+                            <span>Quintuplica produção por 30s</span>
+                        </button>
+                        <button class="admin-action-btn btn-teal" onclick="adminAction('clear_scandal')">
+                            ✅ Zerar Escândalo
+                            <span>Limpa a barra de escândalo</span>
+                        </button>
+                        <button class="admin-action-btn btn-teal" onclick="adminAction('unfreeze')">
+                            🔓 Descongelar
+                            <span>Remove congelamento</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- EVENTO GLOBAL -->
+                <div class="admin-section">
+                    <p class="admin-section-title">🌎 EVENTOS GLOBAIS</p>
+                    <div class="admin-actions-grid">
+                        <button class="admin-action-btn btn-gold" onclick="adminGlobalEvent('milagre')">
+                            🌟 Milagre Econômico
+                            <span>Produção x3 para todos por 30s</span>
+                        </button>
+                        <button class="admin-action-btn btn-red" onclick="adminGlobalEvent('crise')">
+                            📉 Crise Econômica
+                            <span>Produção ÷2 para todos por 30s</span>
+                        </button>
+                        <button class="admin-action-btn btn-orange" onclick="adminGlobalEvent('operacao_policia')">
+                            🚔 Operação Policial
+                            <span>+30 escândalo para todos</span>
+                        </button>
+                        <button class="admin-action-btn btn-purple" onclick="adminGlobalEvent('eleicao')">
+                            🗳️ Eleição Surpresa
+                            <span>Reseta ranking score de todos</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LOG DE AÇÕES -->
+                <div class="admin-section">
+                    <p class="admin-section-title">📋 LOG DE AÇÕES</p>
+                    <div id="admin-log" class="admin-log"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- ===================== MODAL DE RANKING ===================== -->
     <div id="ranking-modal" class="modal-overlay hidden" onclick="toggleRankingModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3>🏆 RANKING PERMANENTE 🏆</h3>
+            <div class="ranking-tabs">
+                <button class="rank-tab active" onclick="switchRankTab('score', this)">Por Score</button>
+                <button class="rank-tab" onclick="switchRankTab('money', this)">Por Dinheiro</button>
+                <button class="rank-tab" onclick="switchRankTab('prestige', this)">Por Prestige</button>
+            </div>
             <ol id="leaderboard-list"></ol>
             <button class="close-modal" onclick="toggleRankingModal()">Fechar</button>
         </div>
@@ -239,497 +318,1330 @@
         </div>
     </div>
 
+    <!-- ===================== MODAL LOJA ESPECIAL ===================== -->
+    <div id="store-modal" class="modal-overlay hidden" onclick="toggleStoreModal()">
+        <div class="modal-content modal-wide" onclick="event.stopPropagation()">
+            <h3>🛒 LOJA ESPECIAL</h3>
+            <div id="store-list" class="store-list"></div>
+            <button class="close-modal" onclick="toggleStoreModal()">Fechar</button>
+        </div>
+    </div>
+
+    <!-- ===================== MODAL ESTATÍSTICAS ===================== -->
+    <div id="stats-modal" class="modal-overlay hidden" onclick="toggleStatsModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3>📊 SUAS ESTATÍSTICAS</h3>
+            <div id="stats-content" class="stats-content"></div>
+            <button class="close-modal" onclick="toggleStatsModal()">Fechar</button>
+        </div>
+    </div>
+
+    <!-- ===================== OVERLAY DE CONGELAMENTO ===================== -->
+    <div id="freeze-overlay" class="freeze-overlay hidden">
+        <div class="freeze-box">
+            <div class="freeze-icon">🧊</div>
+            <p class="freeze-title">PROCESSO CONGELADO!</p>
+            <p class="freeze-desc">O STF congelou seus bens!</p>
+            <p class="freeze-timer">Descongelando em: <span id="freeze-countdown">60</span>s</p>
+        </div>
+    </div>
+
+    <!-- ===================== OVERLAY DE SABOTAGEM ===================== -->
+    <div id="sabotage-overlay" class="sabotage-overlay hidden">
+        <div class="sabotage-box">
+            <div id="sabotage-icon">⚔️</div>
+            <p id="sabotage-title">VOCÊ FOI SABOTADO!</p>
+            <p id="sabotage-desc">Um rival agiu contra você!</p>
+        </div>
+    </div>
+
     <script>
-        // ================================================================
-        // FIREBASE CONFIG
-        // ================================================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyAnyz5Wtr41G_Jrh_SA0TSarCs8ngr1Sk8",
-            authDomain: "game-33d7d.firebaseapp.com",
-            projectId: "game-33d7d",
-            storageBucket: "game-33d7d.firebasestorage.app",
-            messagingSenderId: "636345150384",
-            appId: "1:636345150384:web:b18d2f07b0e8edab8e8475",
-            measurementId: "G-79DZ2E183X"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+    // ================================================================
+    // FIREBASE CONFIG
+    // ================================================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyAnyz5Wtr41G_Jrh_SA0TSarCs8ngr1Sk8",
+        authDomain: "game-33d7d.firebaseapp.com",
+        projectId: "game-33d7d",
+        storageBucket: "game-33d7d.firebasestorage.app",
+        messagingSenderId: "636345150384",
+        appId: "1:636345150384:web:b18d2f07b0e8edab8e8475",
+        measurementId: "G-79DZ2E183X"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-        // ================================================================
-        // VARIÁVEIS DO JOGO
-        // ================================================================
-        let currentUser = null;
-        let isGuest = false;
-        let gameState = {
-            money: 150,
-            prestige: 1,
-            rankingScore: 150,
-            purchasedItems: {},
-            totalClicks: 0,
-            totalEarned: 0
-        };
+    // ================================================================
+    // CONSTANTES DO JOGO
+    // ================================================================
+    const ADMIN_PASSWORD = "admin2025";
 
-        let globalMultiplier = 1;
-        let costMultiplier = 1;
-        let eventTimeout = null;
-        let nivelEscandalo = 25;
-        let monofoneAtivo = false;
-        let possuiAgenteDuplo = false;
-        let malaFalsaAtiva = false;
-        let processoCongelado = false;
-        let vistaDisponivel = true;
+    const ITEMS_CONFIG = [
+        // PROGRAMAS SOCIAIS (esquerda)
+        { id: 'bolsa_familia',  name: 'Bolsa Família',         baseCost: 25,    cycleTime: 2000,  baseProduce: 2,     icon: '📦', side: 'left',  perk: "Nvl 10: Ciclo 2x mais rápido!" },
+        { id: 'gas_povo',       name: 'Gás do Povo',           baseCost: 55,    cycleTime: 3000,  baseProduce: 5,     icon: '🔥', side: 'left',  perk: "Nvl 10: +50% produção!" },
+        { id: 'pe_de_meia',     name: 'Pé de Meia',            baseCost: 90,    cycleTime: 4000,  baseProduce: 8,     icon: '🧦', side: 'left',  perk: "Nvl 10: Ciclo 2x mais rápido!" },
+        { id: 'cad_unico',      name: 'CadÚnico',              baseCost: 180,   cycleTime: 6000,  baseProduce: 18,    icon: '📋', side: 'left',  perk: "Nvl 10: +50% produção!" },
+        { id: 'minha_casa',     name: 'Minha Casa Minha Vida', baseCost: 320,   cycleTime: 8000,  baseProduce: 35,    icon: '🏠', side: 'left',  perk: "Nvl 10: Ciclo 2x mais rápido!" },
+        { id: 'pronatec',       name: 'Pronatec',              baseCost: 600,   cycleTime: 10000, baseProduce: 70,    icon: '🎓', side: 'left',  perk: "Nvl 10: +50% produção!" },
+        { id: 'luz_para_todos', name: 'Luz Para Todos',        baseCost: 1100,  cycleTime: 14000, baseProduce: 140,   icon: '💡', side: 'left',  perk: "Nvl 10: Ciclo 2x mais rápido!" },
+        // INFRAESTRUTURA (direita)
+        { id: 'desenrola',      name: 'Desenrola Brasil',      baseCost: 950,   cycleTime: 14000, baseProduce: 110,   icon: '💸', side: 'right', perk: "Nvl 10: +50% produção!" },
+        { id: 'cnh_brasil',     name: 'CNH do Brasil',         baseCost: 1600,  cycleTime: 18000, baseProduce: 220,   icon: '🪪', side: 'right', perk: "Nvl 10: Ciclo 2x mais rápido!" },
+        { id: 'farmacia',       name: 'Farmácia Popular',      baseCost: 2800,  cycleTime: 22000, baseProduce: 420,   icon: '💊', side: 'right', perk: "Nvl 10: +50% produção!" },
+        { id: 'mais_medicos',   name: 'Mais Médicos',          baseCost: 12500, cycleTime: 48000, baseProduce: 2100,  icon: '🩺', side: 'right', perk: "Nvl 10: Lucro TRIPLO!" },
+        { id: 'pac',            name: 'PAC - Obras',           baseCost: 28000, cycleTime: 60000, baseProduce: 5500,  icon: '🏗️', side: 'right', perk: "Nvl 10: Lucro TRIPLO!" },
+        { id: 'petrobras',      name: 'Petrobras',             baseCost: 75000, cycleTime: 90000, baseProduce: 16000, icon: '🛢️', side: 'right', perk: "Nvl 10: Lucro QUÁDRUPLO!" },
+        { id: 'banco_central',  name: 'Banco Central',         baseCost: 200000,cycleTime:120000, baseProduce: 50000, icon: '🏦', side: 'right', perk: "Nvl 10: Lucro QUÁDRUPLO!" },
+    ];
 
-        // SISTEMA DE COMBO
-        let comboCount = 0;
-        let comboTimeout = null;
+    const DAILY_MISSIONS = [
+        { id: 'clicks_50',   label: 'Clique 50 vezes',          goal: 50,    reward: 5000,   type: 'clicks',    icon: '🖱️' },
+        { id: 'clicks_200',  label: 'Clique 200 vezes',         goal: 200,   reward: 20000,  type: 'clicks',    icon: '🖱️' },
+        { id: 'earn_10k',    label: 'Acumule R$ 10.000',        goal: 10000, reward: 8000,   type: 'earned',    icon: '💰' },
+        { id: 'earn_100k',   label: 'Acumule R$ 100.000',       goal: 100000,reward: 50000,  type: 'earned',    icon: '💰' },
+        { id: 'buy_3',       label: 'Compre 3 programas',       goal: 3,     reward: 3000,   type: 'purchases', icon: '📦' },
+        { id: 'buy_10',      label: 'Compre 10 programas',      goal: 10,    reward: 15000,  type: 'purchases', icon: '📦' },
+        { id: 'sabotage_1',  label: 'Sabote 1 rival',           goal: 1,     reward: 10000,  type: 'sabotages', icon: '⚔️' },
+    ];
 
-        // MISSÕES DIÁRIAS
-        const DAILY_MISSIONS = [
-            { id: 'clicks_50', label: 'Clique 50 vezes', goal: 50, reward: 5000, type: 'clicks', icon: '🖱️' },
-            { id: 'earn_10k', label: 'Acumule R$ 10.000', goal: 10000, reward: 8000, type: 'earned', icon: '💰' },
-            { id: 'buy_3', label: 'Compre 3 programas', goal: 3, reward: 3000, type: 'purchases', icon: '📦' }
-        ];
-        let missionProgress = { clicks_50: 0, earn_10k: 0, buy_3: 0 };
-        let missionCompleted = { clicks_50: false, earn_10k: false, buy_3: false };
+    const ACHIEVEMENTS = [
+        { id: 'first_click',    label: 'Primeiro Clique',     desc: 'Clique pela primeira vez',          icon: '👆', condition: s => s.totalClicks >= 1 },
+        { id: 'clicks_100',     label: 'Clicador Iniciante',  desc: '100 cliques totais',                icon: '🖱️', condition: s => s.totalClicks >= 100 },
+        { id: 'clicks_1000',    label: 'Clicador Profissional',desc: '1.000 cliques totais',             icon: '🖱️', condition: s => s.totalClicks >= 1000 },
+        { id: 'clicks_10000',   label: 'Clicador Lendário',   desc: '10.000 cliques totais',             icon: '🖱️', condition: s => s.totalClicks >= 10000 },
+        { id: 'money_1k',       label: 'Milionário Iniciante',desc: 'R$ 1.000 em caixa',                 icon: '💵', condition: s => s.money >= 1000 },
+        { id: 'money_100k',     label: 'Milionário de Verdade',desc: 'R$ 100.000 em caixa',              icon: '💵', condition: s => s.money >= 100000 },
+        { id: 'money_1m',       label: 'Bilionário',          desc: 'R$ 1.000.000 em caixa',             icon: '💎', condition: s => s.money >= 1000000 },
+        { id: 'prestige_2',     label: 'Renascido',           desc: 'Prestige nível 2',                  icon: '⭐', condition: s => s.prestige >= 2 },
+        { id: 'prestige_5',     label: 'Político Veterano',   desc: 'Prestige nível 5',                  icon: '🌟', condition: s => s.prestige >= 5 },
+        { id: 'scandal_max',    label: 'Escândaloso',         desc: 'Escândalo chegou a 100%',           icon: '🚨', condition: (s,e) => e >= 100 },
+        { id: 'all_items',      label: 'Gestor Completo',     desc: 'Compre pelo menos 1 de cada item',  icon: '🏆', condition: s => Object.keys(s.purchasedItems || {}).length >= ITEMS_CONFIG.length },
+        { id: 'sabotage_5',     label: 'Sabotador',           desc: 'Sabote 5 rivais',                   icon: '⚔️', condition: s => (s.totalSabotages||0) >= 5 },
+    ];
 
-        // CONQUISTAS
-        const ACHIEVEMENTS = [
-            { id: 'first_click', label: 'Primeiro Clique', desc: 'Clique pela primeira vez no Palácio', icon: '👆', condition: () => gameState.totalClicks >= 1 },
-            { id: 'clicks_100', label: 'Clicador Iniciante', desc: 'Realize 100 cliques totais', icon: '🖱️', condition: () => gameState.totalClicks >= 100 },
-            { id: 'money_1k', label: 'Milionário Iniciante', desc: 'Acumule R$ 1.000 em caixa', icon: '💵', condition: () => gameState.money >= 1000 },
-            { id: 'prestige_2', label: 'Renascido', desc: 'Alcance o Prestige nível 2', icon: '⭐', condition: () => gameState.prestige >= 2 },
-            { id: 'scandal_max', label: 'Escândaloso', desc: 'Deixe o escândalo chegar a 100%', icon: '🚨', condition: () => nivelEscandalo >= 100 }
-        ];
-        let unlockedAchievements = new Set();
+    const SPECIAL_STORE = [
+        { id: 'agente_duplo',    name: 'Agente Duplo',       cost: 15000,  desc: 'Sabotagens custam 30% menos',         icon: '🕵️', type: 'passive', effect: 'agente_duplo' },
+        { id: 'escudo_politico', name: 'Escudo Político',    cost: 25000,  desc: 'Imune à próxima sabotagem recebida',  icon: '🛡️', type: 'shield',  effect: 'shield' },
+        { id: 'cpi_falsa',       name: 'CPI Falsa',          cost: 35000,  desc: '+30% escândalo em TODOS os rivais',   icon: '📜', type: 'active',  effect: 'cpi_falsa' },
+        { id: 'delacao_premiada',name: 'Delação Premiada',   cost: 50000,  desc: 'Rouba 10% do dinheiro do 1º do ranking',icon: '🎤', type: 'active', effect: 'delacao' },
+        { id: 'foro_privilegiado',name: 'Foro Privilegiado', cost: 80000,  desc: 'Escândalo não sobe por 2 minutos',    icon: '⚖️', type: 'timed',   effect: 'foro', duration: 120000 },
+        { id: 'caixa_dois',      name: 'Caixa 2',            cost: 120000, desc: '+25% de produção permanente',         icon: '💼', type: 'passive', effect: 'caixa_dois' },
+        { id: 'mensalao',        name: 'Mensalão',           cost: 200000, desc: 'Ganha R$ 5.000/s por 60s',            icon: '💰', type: 'timed',   effect: 'mensalao', duration: 60000 },
+        { id: 'impeachment',     name: 'Impeachment Rival',  cost: 300000, desc: 'Reseta todos os itens de 1 rival',    icon: '🔨', type: 'active',  effect: 'impeachment' },
+    ];
 
-        const ITEMS_CONFIG = [
-            { id: 'bolsa_familia', name: 'Bolsa Família', baseCost: 25, cycleTime: 2000, baseProduce: 2, icon: '📦', side: 'left', perk: "Nvl 10: Ciclo 2x mais rápido!" },
-            { id: 'gas_povo', name: 'Gás do Povo', baseCost: 55, cycleTime: 3000, baseProduce: 5, icon: '🔥', side: 'left', perk: "Nvl 10: +50% de bônus de produção!" },
-            { id: 'pe_de_meia', name: 'Pé de Meia', baseCost: 90, cycleTime: 4000, baseProduce: 8, icon: '🧦', side: 'left', perk: "Nvl 10: Ciclo 2x mais rápido!" },
-            { id: 'cad_unico', name: 'CadÚnico', baseCost: 180, cycleTime: 6000, baseProduce: 18, icon: '📋', side: 'left', perk: "Nvl 10: +50% de bônus de produção!" },
-            { id: 'minha_casa', name: 'Minha Casa Minha Vida', baseCost: 320, cycleTime: 8000, baseProduce: 35, icon: '🏠', side: 'left', perk: "Nvl 10: Ciclo 2x mais rápido!" },
-            { id: 'desenrola', name: 'Desenrola Brasil', baseCost: 950, cycleTime: 14000, baseProduce: 110, icon: '💸', side: 'right', perk: "Nvl 10: +50% de bônus de produção!" },
-            { id: 'cnh_brasil', name: 'CNH do Brasil', baseCost: 1600, cycleTime: 18000, baseProduce: 220, icon: '🪪', side: 'right', perk: "Nvl 10: Ciclo 2x mais rápido!" },
-            { id: 'farmacia', name: 'Farmácia Popular', baseCost: 2800, cycleTime: 22000, baseProduce: 420, icon: '💊', side: 'right', perk: "Nvl 10: +50% de bônus de produção!" },
-            { id: 'mais_medicos', name: 'Mais Médicos', baseCost: 12500, cycleTime: 48000, baseProduce: 2100, icon: '🩺', side: 'right', perk: "Nvl 10: Lucro TRIPLO!" }
-        ];
+    // ================================================================
+    // ESTADO DO JOGO
+    // ================================================================
+    let currentUser = null;
+    let isGuest = false;
+    let isAdmin = false;
+    let gameState = {
+        money: 150, prestige: 1, rankingScore: 150,
+        purchasedItems: {}, totalClicks: 0, totalEarned: 0,
+        totalSabotages: 0, specialItems: {}
+    };
 
-        let activeIntervals = {};
+    let globalMultiplier = 1;
+    let costMultiplier = 1;
+    let nivelEscandalo = 25;
+    let monofoneAtivo = false;
+    let malaFalsaAtiva = false;
+    let processoCongelado = false;
+    let vistaDisponivel = true;
+    let laranjaDisponivel = true;
+    let emendaDisponivel = true;
+    let monofoneDisponivel = true;
+    let foroAtivo = false;
+    let escudoAtivo = false;
+    let comboCount = 0;
+    let comboTimeout = null;
+    let freezeTimer = null;
+    let freezeCountdown = 0;
+    let activeIntervals = {};
+    let missionProgress = {};
+    let missionCompleted = {};
+    let unlockedAchievements = new Set();
+    let currentRankTab = 'score';
+    let rpsHistory = [];
+    let lastRpsMoney = 0;
+    let adminListenerUnsubscribe = null;
+    let scandalInterval = null;
 
-        window.onload = () => {
-            initParticles();
-            const lastUser = localStorage.getItem('bs_last_user');
-            if(lastUser) {
-                document.getElementById('username-input').value = lastUser;
-            }
-        };
+    // Inicializa progresso das missões
+    DAILY_MISSIONS.forEach(m => { missionProgress[m.id] = 0; missionCompleted[m.id] = false; });
 
-        function initParticles() {
-            const canvas = document.getElementById('particles-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            const particles = [];
-            for(let i=0; i<60; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    r: Math.random() * 2 + 1,
-                    dx: (Math.random() - 0.5) * 0.8,
-                    dy: (Math.random() - 0.5) * 0.8
-                });
-            }
-            function animate() {
-                ctx.clearRect(0,0,canvas.width, canvas.height);
-                ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-                particles.forEach(p => {
-                    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
-                    p.x += p.dx; p.y += p.dy;
-                    if(p.x < 0 || p.x > canvas.width) p.dx *= -1;
-                    if(p.y < 0 || p.y > canvas.height) p.dy *= -1;
-                });
-                requestAnimationFrame(animate);
-            }
-            animate();
-        }
+    // ================================================================
+    // INICIALIZAÇÃO
+    // ================================================================
+    window.onload = () => {
+        initParticles();
+        const lastUser = localStorage.getItem('bs_last_user');
+        if (lastUser) document.getElementById('username-input').value = lastUser;
+        // Atalho admin: Ctrl+Shift+A
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'A') promptAdminLogin();
+        });
+    };
 
-        function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
-        function closeAuthModal(e) {
-            if(!e || e.target.classList.contains('modal-overlay') || e.target.classList.contains('auth-modal-close')) {
-                document.getElementById('auth-modal').classList.add('hidden');
-            }
-        }
-
-        function switchAuthTab(tab) {
-            const isLogin = tab === 'login';
-            document.getElementById('tab-login').classList.toggle('active', isLogin);
-            document.getElementById('tab-register').classList.toggle('active', !isLogin);
-            document.getElementById('auth-modal-title').textContent = isLogin ? 'Bem-vindo de volta!' : 'Criar Nova Conta';
-            document.getElementById('auth-modal-desc').textContent = isLogin ? 'Entre com sua conta para continuar sua jornada política.' : 'Registre-se para salvar seu progresso no ranking permanente.';
-            document.getElementById('btn-auth-text').textContent = isLogin ? 'ENTRAR NO JOGO' : 'CRIAR CONTA';
-        }
-
-        async function confirmAuth() {
-            const username = document.getElementById('username-input').value.trim();
-            const password = document.getElementById('password-input').value;
-            const msg = document.getElementById('auth-message');
-            const isLogin = document.getElementById('tab-login').classList.contains('active');
-
-            if(!username || !password) { msg.textContent = "Preencha todos os campos!"; return; }
-            if(username.length < 3) { msg.textContent = "Usuário muito curto!"; return; }
-
-            const userRef = db.collection("users").doc(username);
-            try {
-                const doc = await userRef.get();
-                if(isLogin) {
-                    if(doc.exists && doc.data().password === password) {
-                        currentUser = username;
-                        gameState = doc.data();
-                        localStorage.setItem('bs_last_user', username);
-                        startGame();
-                    } else { msg.textContent = "Usuário ou senha incorretos!"; }
-                } else {
-                    if(doc.exists) { msg.textContent = "Usuário já existe!"; }
-                    else {
-                        await userRef.set({
-                            username, password,
-                            money: 150, prestige: 1, rankingScore: 150,
-                            purchasedItems: {}, totalClicks: 0, totalEarned: 0
-                        });
-                        msg.style.color = "#00ff66";
-                        msg.textContent = "Registrado! Clique em ENTRAR.";
-                    }
-                }
-            } catch(e) { msg.textContent = "Erro de conexão!"; }
-        }
-
-        function playAsGuest() {
-            currentUser = "Convidado";
-            isGuest = true;
-            startGame();
-        }
-
-        function startGame() {
-            document.getElementById('splash-screen').classList.add('hidden');
-            document.getElementById('auth-modal').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
-            document.getElementById('display-username').textContent = currentUser;
-            
-            updateUI();
-            buildStore();
-            startProductionCycles();
-            startEventEngine();
-            renderMissions();
-            renderAchievements();
-        }
-
-        function mainClickBoost() {
-            if(processoCongelado) return;
-            let baseGain = 1;
-            let prestigeMult = gameState.prestige;
-            let eventMult = globalMultiplier;
-            let gain = Math.floor(baseGain * prestigeMult * eventMult);
-            
-            if(monofoneAtivo) gain += 5;
-            
-            comboCount++;
-            clearTimeout(comboTimeout);
-            comboTimeout = setTimeout(() => {
-                comboCount = 0;
-                document.getElementById('combo-display').classList.add('hidden');
-            }, 1500);
-
-            if(comboCount > 5) {
-                gain += Math.floor(comboCount / 2);
-                document.getElementById('combo-display').classList.remove('hidden');
-                document.getElementById('combo-count').textContent = comboCount;
-            }
-
-            gameState.money += gain;
-            gameState.totalEarned += gain;
-            gameState.totalClicks++;
-            gameState.rankingScore += gain;
-
-            updateMission('clicks', 1);
-            updateMission('earned', gain);
-            checkAchievements();
-            updateUI();
-            saveGame();
-            showFloatNotif(`+R$ ${gain}`);
-        }
-
-        function updateUI() {
-            document.getElementById('stat-money').textContent = Math.floor(gameState.money).toLocaleString();
-            document.getElementById('stat-prestige').textContent = gameState.prestige;
-            document.getElementById('stat-prestige-bonus').textContent = (gameState.prestige - 1) * 15;
-            document.getElementById('stat-click-power').textContent = Math.floor(1 * gameState.prestige * globalMultiplier + (monofoneAtivo ? 5 : 0));
-            document.getElementById('barra-escandalo').style.width = nivelEscandalo + '%';
-        }
-
-        function buildStore() {
-            const leftContainer = document.getElementById('left-items-container');
-            const rightContainer = document.getElementById('right-items-container');
-            leftContainer.innerHTML = "";
-            rightContainer.innerHTML = "";
-
-            ITEMS_CONFIG.forEach(item => {
-                const count = gameState.purchasedItems[item.id] || 0;
-                const cost = Math.floor(item.baseCost * Math.pow(1.4, count) * costMultiplier);
-                const prod = (item.baseProduce * count * (1 + (gameState.prestige-1)*0.15) * globalMultiplier).toFixed(1);
-                
-                const box = document.createElement('div');
-                box.className = `upgrade-box ${count > 0 ? 'owned-claro' : 'locked-escuro'}`;
-                box.innerHTML = `
-                    <div class="box-header">
-                        <div class="item-icon-frame">${item.icon}</div>
-                        <div class="item-meta">
-                            <div class="title-row">
-                                <span class="item-title">${item.name}</span>
-                                <span class="item-badge">Qtd: ${count}</span>
-                            </div>
-                            <span class="item-cost">Custo: R$ ${cost.toLocaleString()}</span>
-                            <div class="item-production">Gera: R$ ${prod}/ciclo</div>
-                        </div>
-                    </div>
-                    <div class="perk-text">${item.perk}</div>
-                    <div class="box-footer">
-                        <button onclick="buyUpgrade('${item.id}')">Evoluir</button>
-                        <div class="bar-and-time">
-                            <div class="progress-outer"><div id="progress-${item.id}" class="progress-inner"></div></div>
-                        </div>
-                    </div>
-                `;
-                if(item.side === 'left') leftContainer.appendChild(box);
-                else rightContainer.appendChild(box);
+    function initParticles() {
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const particles = [];
+        for (let i = 0; i < 70; i++) {
+            particles.push({
+                x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                r: Math.random() * 2 + 1, dx: (Math.random() - 0.5) * 0.8, dy: (Math.random() - 0.5) * 0.8
             });
         }
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "rgba(255,255,255,0.5)";
+            particles.forEach(p => {
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+                p.x += p.dx; p.y += p.dy;
+                if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
 
-        function buyUpgrade(id) {
-            const item = ITEMS_CONFIG.find(i => i.id === id);
-            const count = gameState.purchasedItems[id] || 0;
+    // ================================================================
+    // AUTH
+    // ================================================================
+    function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
+    function closeAuthModal(e) {
+        if (!e || e.target.classList.contains('modal-overlay') || e.target.classList.contains('auth-modal-close')) {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+    }
+    function switchAuthTab(tab) {
+        const isLogin = tab === 'login';
+        document.getElementById('tab-login').classList.toggle('active', isLogin);
+        document.getElementById('tab-register').classList.toggle('active', !isLogin);
+        document.getElementById('auth-modal-title').textContent = isLogin ? 'Bem-vindo de volta!' : 'Criar Nova Conta';
+        document.getElementById('auth-modal-desc').textContent = isLogin
+            ? 'Entre com sua conta para continuar sua jornada política.'
+            : 'Registre-se para salvar seu progresso no ranking permanente.';
+        document.getElementById('btn-auth-text').textContent = isLogin ? 'ENTRAR NO JOGO' : 'CRIAR CONTA';
+    }
+
+    async function confirmAuth() {
+        const username = document.getElementById('username-input').value.trim();
+        const password = document.getElementById('password-input').value;
+        const msg = document.getElementById('auth-message');
+        const isLogin = document.getElementById('tab-login').classList.contains('active');
+        if (!username || !password) { msg.textContent = "Preencha todos os campos!"; return; }
+        if (username.length < 3) { msg.textContent = "Usuário muito curto (mín. 3 chars)!"; return; }
+        msg.textContent = "Verificando...";
+        const userRef = db.collection("users").doc(username);
+        try {
+            const doc = await userRef.get();
+            if (isLogin) {
+                if (doc.exists && doc.data().password === password) {
+                    currentUser = username;
+                    const data = doc.data();
+                    gameState = {
+                        money: data.money || 150,
+                        prestige: data.prestige || 1,
+                        rankingScore: data.rankingScore || 150,
+                        purchasedItems: data.purchasedItems || {},
+                        totalClicks: data.totalClicks || 0,
+                        totalEarned: data.totalEarned || 0,
+                        totalSabotages: data.totalSabotages || 0,
+                        specialItems: data.specialItems || {},
+                        password: data.password
+                    };
+                    nivelEscandalo = data.nivelEscandalo || 25;
+                    localStorage.setItem('bs_last_user', username);
+                    startGame();
+                } else { msg.textContent = "Usuário ou senha incorretos!"; }
+            } else {
+                if (doc.exists) { msg.textContent = "Usuário já existe!"; }
+                else {
+                    const newState = {
+                        username, password,
+                        money: 150, prestige: 1, rankingScore: 150,
+                        purchasedItems: {}, totalClicks: 0, totalEarned: 0,
+                        totalSabotages: 0, specialItems: {}, nivelEscandalo: 25
+                    };
+                    await userRef.set(newState);
+                    msg.style.color = "#00ff66";
+                    msg.textContent = "Registrado! Clique em ENTRAR.";
+                    switchAuthTab('login');
+                }
+            }
+        } catch (e) { msg.textContent = "Erro de conexão! Tente novamente."; console.error(e); }
+    }
+
+    function playAsGuest() {
+        currentUser = "Convidado_" + Math.floor(Math.random() * 9999);
+        isGuest = true;
+        startGame();
+    }
+
+    // ================================================================
+    // INÍCIO DO JOGO
+    // ================================================================
+    function startGame() {
+        document.getElementById('splash-screen').classList.add('hidden');
+        document.getElementById('auth-modal').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        document.getElementById('display-username').textContent = currentUser;
+        updateUI();
+        buildStore();
+        startProductionCycles();
+        startEventEngine();
+        startScandalEngine();
+        renderMissions();
+        renderAchievements();
+        renderSpecialStore();
+        startRpsCounter();
+        if (!isGuest) startAdminCommandListener();
+    }
+
+    // ================================================================
+    // CLIQUE PRINCIPAL
+    // ================================================================
+    function mainClickBoost() {
+        if (processoCongelado) {
+            showFloatNotif("❄️ Processo congelado!");
+            return;
+        }
+        const prestigeMult = gameState.prestige;
+        const eventMult = globalMultiplier;
+        const caixaDoisBonus = gameState.specialItems['caixa_dois'] ? 1.25 : 1;
+        let gain = Math.floor(1 * prestigeMult * eventMult * caixaDoisBonus);
+        if (monofoneAtivo) gain += Math.floor(gain * 0.5) + 5;
+
+        comboCount++;
+        clearTimeout(comboTimeout);
+        comboTimeout = setTimeout(() => {
+            comboCount = 0;
+            document.getElementById('combo-display').classList.add('hidden');
+        }, 1500);
+        if (comboCount > 5) {
+            gain += Math.floor(comboCount * 1.5);
+            document.getElementById('combo-display').classList.remove('hidden');
+            document.getElementById('combo-count').textContent = comboCount;
+        }
+
+        gameState.money += gain;
+        gameState.totalEarned += gain;
+        gameState.totalClicks++;
+        gameState.rankingScore += gain;
+
+        updateMission('clicks', 1);
+        updateMission('earned', gain);
+        checkAchievements();
+        updateUI();
+        saveGame();
+        showFloatNotif(`+R$ ${gain.toLocaleString()}`);
+
+        // Escândalo sobe levemente ao clicar (risco político)
+        if (!foroAtivo && Math.random() < 0.02) {
+            nivelEscandalo = Math.min(100, nivelEscandalo + 1);
+            updateUI();
+        }
+    }
+
+    // ================================================================
+    // UI
+    // ================================================================
+    function updateUI() {
+        document.getElementById('stat-money').textContent = formatMoney(gameState.money);
+        document.getElementById('stat-prestige').textContent = gameState.prestige;
+        document.getElementById('stat-prestige-bonus').textContent = (gameState.prestige - 1) * 15;
+        const caixaDoisBonus = gameState.specialItems['caixa_dois'] ? 1.25 : 1;
+        const clickPower = Math.floor(1 * gameState.prestige * globalMultiplier * caixaDoisBonus + (monofoneAtivo ? 5 : 0));
+        document.getElementById('stat-click-power').textContent = clickPower;
+        document.getElementById('barra-escandalo').style.width = nivelEscandalo + '%';
+        document.getElementById('barra-escandalo').style.background =
+            nivelEscandalo > 75 ? 'linear-gradient(90deg,#ff3300,#ff0000)' :
+            nivelEscandalo > 50 ? 'linear-gradient(90deg,#ff9900,#ff3333)' :
+            'linear-gradient(90deg,#ffcc00,#ff9900)';
+        // Botão prestige
+        const required = 100000 * gameState.prestige;
+        const btn = document.getElementById('prestige-trigger-btn');
+        btn.style.opacity = gameState.money >= required ? '1' : '0.5';
+    }
+
+    function formatMoney(n) {
+        if (n >= 1e12) return (n / 1e12).toFixed(2) + ' T';
+        if (n >= 1e9)  return (n / 1e9).toFixed(2) + ' Bi';
+        if (n >= 1e6)  return (n / 1e6).toFixed(2) + ' Mi';
+        return Math.floor(n).toLocaleString('pt-BR');
+    }
+
+    // ================================================================
+    // LOJA DE ITENS
+    // ================================================================
+    function buildStore() {
+        const leftContainer = document.getElementById('left-items-container');
+        const rightContainer = document.getElementById('right-items-container');
+        leftContainer.innerHTML = "";
+        rightContainer.innerHTML = "";
+
+        ITEMS_CONFIG.forEach(item => {
+            const count = gameState.purchasedItems[item.id] || 0;
             const cost = Math.floor(item.baseCost * Math.pow(1.4, count) * costMultiplier);
+            const caixaDoisBonus = gameState.specialItems['caixa_dois'] ? 1.25 : 1;
+            const prod = (item.baseProduce * count * (1 + (gameState.prestige - 1) * 0.15) * globalMultiplier * caixaDoisBonus).toFixed(1);
+            const isMastered = count >= 10;
+            const canAfford = gameState.money >= cost;
 
-            if(gameState.money >= cost) {
-                gameState.money -= cost;
-                gameState.purchasedItems[id] = count + 1;
-                updateMission('purchases', 1);
-                buildStore();
+            const box = document.createElement('div');
+            box.className = `upgrade-box ${count > 0 ? 'owned-claro' : 'locked-escuro'} ${isMastered ? 'milestone-mastered' : ''}`;
+            box.innerHTML = `
+                <div class="box-header">
+                    <div class="item-icon-frame">${item.icon}</div>
+                    <div class="item-meta">
+                        <div class="title-row">
+                            <span class="item-title">${item.name}</span>
+                            <span class="item-badge">x${count}</span>
+                        </div>
+                        <span class="item-cost ${canAfford ? 'can-afford' : ''}">Custo: R$ ${cost.toLocaleString('pt-BR')}</span>
+                        <div class="item-production">Gera: R$ ${prod}/ciclo</div>
+                    </div>
+                </div>
+                <div class="perk-text">${isMastered ? '✅ DOMINADO!' : item.perk}</div>
+                <div class="box-footer">
+                    <button onclick="buyUpgrade('${item.id}')" ${canAfford ? '' : 'disabled'}>Evoluir</button>
+                    <div class="bar-and-time">
+                        <div class="progress-outer"><div id="progress-${item.id}" class="progress-inner"></div></div>
+                    </div>
+                </div>
+            `;
+            if (item.side === 'left') leftContainer.appendChild(box);
+            else rightContainer.appendChild(box);
+        });
+    }
+
+    function buyUpgrade(id) {
+        if (processoCongelado) { showFloatNotif("❄️ Processo congelado!"); return; }
+        const item = ITEMS_CONFIG.find(i => i.id === id);
+        const count = gameState.purchasedItems[id] || 0;
+        const cost = Math.floor(item.baseCost * Math.pow(1.4, count) * costMultiplier);
+        if (gameState.money >= cost) {
+            gameState.money -= cost;
+            gameState.purchasedItems[id] = count + 1;
+            updateMission('purchases', 1);
+            buildStore();
+            updateUI();
+            startProductionCycles();
+            saveGame();
+            showFloatNotif(`✅ ${item.name} nível ${count + 1}!`);
+        } else {
+            showFloatNotif(`❌ Sem dinheiro! Faltam R$ ${formatMoney(cost - gameState.money)}`);
+        }
+    }
+
+    // ================================================================
+    // CICLOS DE PRODUÇÃO
+    // ================================================================
+    function startProductionCycles() {
+        Object.values(activeIntervals).forEach(clearInterval);
+        activeIntervals = {};
+        ITEMS_CONFIG.forEach(item => {
+            const count = gameState.purchasedItems[item.id] || 0;
+            if (count > 0) {
+                let progress = 0;
+                let cycleTime = item.cycleTime;
+                if (count >= 10 && (item.id === 'bolsa_familia' || item.id === 'pe_de_meia' || item.id === 'minha_casa' || item.id === 'cnh_brasil' || item.id === 'pac' || item.id === 'luz_para_todos')) {
+                    cycleTime = cycleTime / 2;
+                }
+                const tick = cycleTime / 50;
+                activeIntervals[item.id] = setInterval(() => {
+                    if (processoCongelado) return;
+                    progress += 2;
+                    if (progress >= 100) {
+                        progress = 0;
+                        const caixaDoisBonus = gameState.specialItems['caixa_dois'] ? 1.25 : 1;
+                        let bonusMult = 1;
+                        if (count >= 10 && (item.id === 'gas_povo' || item.id === 'cad_unico' || item.id === 'desenrola' || item.id === 'farmacia')) bonusMult = 1.5;
+                        if (count >= 10 && (item.id === 'mais_medicos' || item.id === 'pac' || item.id === 'petrobras' || item.id === 'banco_central')) bonusMult = 3;
+                        const prod = Math.floor(item.baseProduce * count * (1 + (gameState.prestige - 1) * 0.15) * globalMultiplier * caixaDoisBonus * bonusMult);
+                        gameState.money += prod;
+                        gameState.totalEarned += prod;
+                        gameState.rankingScore += prod;
+                        updateMission('earned', prod);
+                        updateUI();
+                        saveGame();
+                    }
+                    const el = document.getElementById(`progress-${item.id}`);
+                    if (el) el.style.width = progress + '%';
+                }, tick);
+            }
+        });
+    }
+
+    // ================================================================
+    // CONTADOR DE R$/s
+    // ================================================================
+    function startRpsCounter() {
+        lastRpsMoney = gameState.money;
+        setInterval(() => {
+            const rps = Math.max(0, gameState.money - lastRpsMoney);
+            document.getElementById('stat-rps').textContent = formatMoney(rps);
+            lastRpsMoney = gameState.money;
+        }, 1000);
+    }
+
+    // ================================================================
+    // MISSÕES
+    // ================================================================
+    function updateMission(type, val) {
+        DAILY_MISSIONS.forEach(m => {
+            if (m.type === type && !missionCompleted[m.id]) {
+                missionProgress[m.id] = (missionProgress[m.id] || 0) + val;
+                if (missionProgress[m.id] >= m.goal) {
+                    missionProgress[m.id] = m.goal;
+                    missionCompleted[m.id] = true;
+                    gameState.money += m.reward;
+                    showFloatNotif(`🎯 Missão Concluída! +R$ ${m.reward.toLocaleString()}`);
+                }
+            }
+        });
+        renderMissions();
+    }
+
+    function renderMissions() {
+        const list = document.getElementById('missions-list');
+        if (!list) return;
+        list.innerHTML = "";
+        DAILY_MISSIONS.forEach(m => {
+            const prog = missionProgress[m.id] || 0;
+            const perc = Math.min(100, (prog / m.goal) * 100);
+            const done = missionCompleted[m.id];
+            list.innerHTML += `
+                <div class="mission-card ${done ? 'mission-done' : ''}">
+                    <div class="mission-icon">${m.icon}</div>
+                    <div class="mission-info">
+                        <span class="mission-label">${m.label}</span>
+                        <span class="mission-sub">${prog.toLocaleString()} / ${m.goal.toLocaleString()} · Recompensa: R$ ${m.reward.toLocaleString()}</span>
+                        <div class="mission-progress-outer"><div class="mission-progress-inner" style="width:${perc}%"></div></div>
+                    </div>
+                    <div class="mission-check">${done ? '✅' : ''}</div>
+                </div>
+            `;
+        });
+        const nextM = DAILY_MISSIONS.find(m => !missionCompleted[m.id]) || DAILY_MISSIONS[DAILY_MISSIONS.length - 1];
+        const prog = missionProgress[nextM.id] || 0;
+        document.getElementById('daily-mission-text').textContent = `🎯 ${nextM.label}`;
+        document.getElementById('daily-progress-inner').style.width = (prog / nextM.goal * 100) + '%';
+        document.getElementById('daily-mission-reward').textContent = `+R$ ${nextM.reward.toLocaleString()}`;
+    }
+
+    // ================================================================
+    // CONQUISTAS
+    // ================================================================
+    function checkAchievements() {
+        ACHIEVEMENTS.forEach(a => {
+            if (!unlockedAchievements.has(a.id) && a.condition(gameState, nivelEscandalo)) {
+                unlockedAchievements.add(a.id);
+                showFloatNotif(`🏅 Conquista: ${a.label}!`);
+            }
+        });
+        renderAchievements();
+    }
+
+    function renderAchievements() {
+        const list = document.getElementById('achievements-list');
+        if (!list) return;
+        list.innerHTML = "";
+        ACHIEVEMENTS.forEach(a => {
+            const unlocked = unlockedAchievements.has(a.id);
+            list.innerHTML += `
+                <div class="achievement-card ${unlocked ? 'achievement-unlocked' : 'achievement-locked'}">
+                    <div class="achievement-icon">${a.icon}</div>
+                    <div class="achievement-info">
+                        <span class="achievement-label">${a.label}</span>
+                        <p class="achievement-desc">${a.desc}</p>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // ================================================================
+    // LOJA ESPECIAL
+    // ================================================================
+    function renderSpecialStore() {
+        const list = document.getElementById('store-list');
+        if (!list) return;
+        list.innerHTML = "";
+        SPECIAL_STORE.forEach(item => {
+            const owned = gameState.specialItems[item.id];
+            const canAfford = gameState.money >= item.cost;
+            list.innerHTML += `
+                <div class="store-item ${owned ? 'store-owned' : ''}">
+                    <div class="store-item-icon">${item.icon}</div>
+                    <div class="store-item-info">
+                        <span class="store-item-name">${item.name}</span>
+                        <p class="store-item-desc">${item.desc}</p>
+                        <span class="store-item-cost">R$ ${item.cost.toLocaleString('pt-BR')}</span>
+                    </div>
+                    <button class="game-btn ${canAfford && !owned ? 'btn-gold' : 'btn-gray'}" onclick="buySpecialItem('${item.id}')" ${owned ? 'disabled' : ''}>
+                        ${owned ? '✅ COMPRADO' : 'COMPRAR'}
+                    </button>
+                </div>
+            `;
+        });
+    }
+
+    function buySpecialItem(id) {
+        const item = SPECIAL_STORE.find(i => i.id === id);
+        if (!item || gameState.specialItems[id]) return;
+        if (gameState.money < item.cost) { showFloatNotif("❌ Sem dinheiro!"); return; }
+        gameState.money -= item.cost;
+
+        if (item.effect === 'cpi_falsa') {
+            // Ativa sabotagem em todos os rivais
+            executarSabotagemGlobal('cpi_falsa');
+        } else if (item.effect === 'delacao') {
+            executarDelacao();
+        } else if (item.effect === 'mensalao') {
+            ativarMensalao(item.duration);
+        } else if (item.effect === 'foro') {
+            foroAtivo = true;
+            showFloatNotif("⚖️ Foro Privilegiado ativo! Escândalo congelado por 2min.");
+            setTimeout(() => { foroAtivo = false; showFloatNotif("⚖️ Foro Privilegiado expirou!"); }, item.duration);
+        } else if (item.effect === 'shield') {
+            escudoAtivo = true;
+            showFloatNotif("🛡️ Escudo Político ativo!");
+            gameState.specialItems[id] = true;
+        } else if (item.effect === 'impeachment') {
+            abrirModalImpeachment();
+            return;
+        } else {
+            gameState.specialItems[id] = true;
+        }
+
+        if (item.effect !== 'shield' && item.effect !== 'impeachment') {
+            gameState.specialItems[id] = true;
+        }
+        updateUI();
+        buildStore();
+        startProductionCycles();
+        renderSpecialStore();
+        saveGame();
+        showFloatNotif(`✅ ${item.name} ativado!`);
+    }
+
+    function abrirModalImpeachment() {
+        // Abre seletor de alvo para impeachment
+        const target = prompt("Digite o nome do usuário que deseja impeachar:");
+        if (!target) return;
+        enviarComandoParaJogador(target, { type: 'reset_items', from: currentUser });
+        gameState.money -= 300000;
+        gameState.specialItems['impeachment'] = true;
+        updateUI();
+        saveGame();
+        showFloatNotif(`🔨 Impeachment enviado para ${target}!`);
+    }
+
+    async function executarDelacao() {
+        try {
+            const snap = await db.collection("users").orderBy("rankingScore", "desc").limit(1).get();
+            if (!snap.empty) {
+                const topUser = snap.docs[0];
+                const topData = topUser.data();
+                const stolen = Math.floor((topData.money || 0) * 0.1);
+                await db.collection("users").doc(topUser.id).update({ money: (topData.money || 0) - stolen });
+                gameState.money += stolen;
+                showFloatNotif(`🎤 Delação! Roubou R$ ${stolen.toLocaleString()} do 1º do ranking!`);
                 updateUI();
-                startProductionCycles();
                 saveGame();
             }
-        }
+        } catch (e) { console.error(e); }
+    }
 
-        function startProductionCycles() {
-            Object.values(activeIntervals).forEach(clearInterval);
-            ITEMS_CONFIG.forEach(item => {
-                const count = gameState.purchasedItems[item.id] || 0;
-                if(count > 0) {
-                    let progress = 0;
-                    activeIntervals[item.id] = setInterval(() => {
-                        progress += 2;
-                        if(progress >= 100) {
-                            progress = 0;
-                            const prod = Math.floor(item.baseProduce * count * (1 + (gameState.prestige-1)*0.15) * globalMultiplier);
-                            gameState.money += prod;
-                            gameState.totalEarned += prod;
-                            gameState.rankingScore += prod;
-                            updateMission('earned', prod);
-                            updateUI();
-                            saveGame();
-                        }
-                        const el = document.getElementById(`progress-${item.id}`);
-                        if(el) el.style.width = progress + '%';
-                    }, item.cycleTime / 50);
-                }
-            });
-        }
-
-        function updateMission(type, val) {
-            DAILY_MISSIONS.forEach(m => {
-                if(m.type === type && !missionCompleted[m.id]) {
-                    missionProgress[m.id] += val;
-                    if(missionProgress[m.id] >= m.goal) {
-                        missionProgress[m.id] = m.goal;
-                        missionCompleted[m.id] = true;
-                        gameState.money += m.reward;
-                        showFloatNotif(`Missão Concluída! +R$ ${m.reward}`);
-                    }
-                }
-            });
-            renderMissions();
-        }
-
-        function renderMissions() {
-            const list = document.getElementById('missions-list');
-            list.innerHTML = "";
-            DAILY_MISSIONS.forEach(m => {
-                const perc = (missionProgress[m.id] / m.goal) * 100;
-                list.innerHTML += `
-                    <div class="mission-card ${missionCompleted[m.id] ? 'mission-done' : ''}">
-                        <div class="mission-icon">${m.icon}</div>
-                        <div class="mission-info">
-                            <span class="mission-label">${m.label}</span>
-                            <div class="mission-progress-outer"><div class="mission-progress-inner" style="width:${perc}%"></div></div>
-                        </div>
-                    </div>
-                `;
-            });
-            const mainBarText = document.getElementById('daily-mission-text');
-            const mainBarInner = document.getElementById('daily-progress-inner');
-            const mainBarReward = document.getElementById('daily-mission-reward');
-            
-            const nextM = DAILY_MISSIONS.find(m => !missionCompleted[m.id]) || DAILY_MISSIONS[0];
-            mainBarText.textContent = `🎯 ${nextM.label}`;
-            mainBarInner.style.width = (missionProgress[nextM.id] / nextM.goal * 100) + '%';
-            mainBarReward.textContent = `+R$ ${nextM.reward.toLocaleString()}`;
-        }
-
-        function checkAchievements() {
-            ACHIEVEMENTS.forEach(a => {
-                if(!unlockedAchievements.has(a.id) && a.condition()) {
-                    unlockedAchievements.add(a.id);
-                    showFloatNotif(`🏆 Conquista: ${a.label}`);
-                }
-            });
-            renderAchievements();
-        }
-
-        function renderAchievements() {
-            const list = document.getElementById('achievements-list');
-            list.innerHTML = "";
-            ACHIEVEMENTS.forEach(a => {
-                const unlocked = unlockedAchievements.has(a.id);
-                list.innerHTML += `
-                    <div class="achievement-card ${unlocked ? 'achievement-unlocked' : 'achievement-locked'}">
-                        <div class="achievement-icon">${a.icon}</div>
-                        <div class="achievement-info">
-                            <span class="achievement-label">${a.label}</span>
-                            <p style="font-size:7px; color:#736d8c;">${a.desc}</p>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function saveGame() {
-            if(currentUser && !isGuest) {
-                db.collection("users").doc(currentUser).set(gameState);
+    function ativarMensalao(duration) {
+        let elapsed = 0;
+        const tick = 1000;
+        const perSecond = 5000;
+        const interval = setInterval(() => {
+            if (processoCongelado) return;
+            gameState.money += perSecond;
+            gameState.totalEarned += perSecond;
+            gameState.rankingScore += perSecond;
+            updateUI();
+            elapsed += tick;
+            if (elapsed >= duration) {
+                clearInterval(interval);
+                showFloatNotif("💰 Mensalão encerrado!");
             }
-        }
+        }, tick);
+        showFloatNotif("💰 Mensalão ativo! +R$ 5.000/s por 60s!");
+    }
 
-        function showFloatNotif(txt) {
-            const el = document.getElementById('float-notif');
-            el.textContent = txt;
-            el.classList.remove('hidden');
-            el.classList.add('float-notif-show');
-            setTimeout(() => {
-                el.classList.remove('float-notif-show');
-                el.classList.add('hidden');
-            }, 2000);
-        }
-
-        function startEventEngine() {
-            setInterval(() => {
-                if(Math.random() < 0.3) {
-                    globalMultiplier = 2;
-                    const ticker = document.getElementById('event-ticker');
-                    ticker.textContent = "🚀 MILAGRE ECONÔMICO: Produção x2!";
-                    ticker.className = "event-ticker-active event-positive";
-                    setTimeout(() => {
-                        globalMultiplier = 1;
-                        ticker.className = "ticker-hidden";
-                    }, 15000);
+    async function executarSabotagemGlobal(type) {
+        try {
+            const snap = await db.collection("users").get();
+            snap.forEach(doc => {
+                if (doc.id !== currentUser) {
+                    enviarComandoParaJogador(doc.id, { type: 'scandal_plus30', from: currentUser });
                 }
-            }, 45000);
-        }
+            });
+            showFloatNotif("📜 CPI Falsa! +30% escândalo em todos os rivais!");
+        } catch (e) { console.error(e); }
+    }
 
-        function toggleRankingModal() {
-            const modal = document.getElementById('ranking-modal');
-            modal.classList.toggle('hidden');
-            if(!modal.classList.contains('hidden')) renderLeaderboard();
-        }
+    // ================================================================
+    // ESTATÍSTICAS
+    // ================================================================
+    function renderStats() {
+        const el = document.getElementById('stats-content');
+        if (!el) return;
+        const totalProd = ITEMS_CONFIG.reduce((acc, item) => {
+            const count = gameState.purchasedItems[item.id] || 0;
+            return acc + item.baseProduce * count;
+        }, 0);
+        el.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-row"><span>Total de Cliques</span><span>${gameState.totalClicks.toLocaleString()}</span></div>
+                <div class="stat-row"><span>Total Ganho</span><span>R$ ${formatMoney(gameState.totalEarned)}</span></div>
+                <div class="stat-row"><span>Dinheiro Atual</span><span>R$ ${formatMoney(gameState.money)}</span></div>
+                <div class="stat-row"><span>Prestige</span><span>${gameState.prestige}</span></div>
+                <div class="stat-row"><span>Score de Ranking</span><span>${formatMoney(gameState.rankingScore)}</span></div>
+                <div class="stat-row"><span>Produção Base/ciclo</span><span>R$ ${totalProd.toLocaleString()}</span></div>
+                <div class="stat-row"><span>Nível de Escândalo</span><span>${nivelEscandalo.toFixed(0)}%</span></div>
+                <div class="stat-row"><span>Sabotagens Realizadas</span><span>${gameState.totalSabotages || 0}</span></div>
+                <div class="stat-row"><span>Conquistas</span><span>${unlockedAchievements.size} / ${ACHIEVEMENTS.length}</span></div>
+                <div class="stat-row"><span>Modo</span><span>${isGuest ? 'Convidado' : 'Registrado'}</span></div>
+            </div>
+        `;
+    }
 
-        async function renderLeaderboard() {
-            const list = document.getElementById('leaderboard-list');
-            list.innerHTML = "Carregando...";
-            const snapshot = await db.collection("users").orderBy("rankingScore", "desc").limit(10).get();
+    // ================================================================
+    // MECÂNICAS POLÍTICAS
+    // ================================================================
+    function abafarCaso() {
+        if (gameState.money < 1500) { showFloatNotif("❌ Sem dinheiro!"); return; }
+        gameState.money -= 1500;
+        nivelEscandalo = Math.max(0, nivelEscandalo - 30);
+        updateUI();
+        saveGame();
+        showFloatNotif("🧹 Caso abafado! -30% escândalo");
+    }
+
+    function contratarLobbysta() {
+        if (gameState.money < 4000) { showFloatNotif("❌ Sem dinheiro!"); return; }
+        gameState.money -= 4000;
+        nivelEscandalo = Math.max(0, nivelEscandalo - 60);
+        updateUI();
+        saveGame();
+        showFloatNotif("🤝 Lobbysta contratado! -60% escândalo");
+    }
+
+    function ativarPedirVista() {
+        if (!vistaDisponivel) { showFloatNotif("⏳ Ainda em cooldown!"); return; }
+        vistaDisponivel = false;
+        processoCongelado = true;
+        const btn = document.getElementById('btn-pedir-vista');
+        const cd = document.getElementById('cd-vista');
+        btn.disabled = true;
+        cd.textContent = "30s";
+        let t = 30;
+        const iv = setInterval(() => {
+            t--;
+            cd.textContent = t + 's';
+            if (t <= 0) {
+                clearInterval(iv);
+                processoCongelado = false;
+                vistaDisponivel = true;
+                btn.disabled = false;
+                cd.textContent = "PRONTO";
+                showFloatNotif("⚖️ Vista encerrada!");
+            }
+        }, 1000);
+        showFloatNotif("⚖️ Vista pedida! Processo congelado por 30s");
+    }
+
+    function comprarMalaFalsa() {
+        if (gameState.money < 1100) { showFloatNotif("❌ Sem dinheiro!"); return; }
+        gameState.money -= 1100;
+        nivelEscandalo = Math.max(0, nivelEscandalo - 15);
+        updateUI();
+        saveGame();
+        showFloatNotif("💼 Mala falsa usada! -15% escândalo");
+    }
+
+    function abrirOffshore() {
+        if (gameState.money < 8000) { showFloatNotif("❌ Sem dinheiro!"); return; }
+        gameState.money -= 8000;
+        nivelEscandalo = Math.max(0, nivelEscandalo - 50);
+        globalMultiplier = Math.min(globalMultiplier * 1.1, 5);
+        updateUI();
+        saveGame();
+        showFloatNotif("🏝️ Offshore aberta! -50% escândalo e +10% multiplicador!");
+    }
+
+    function usarLaranjas() {
+        if (!laranjaDisponivel) { showFloatNotif("⏳ Laranjas em cooldown!"); return; }
+        laranjaDisponivel = false;
+        const bonus = Math.floor(gameState.money * 0.15);
+        gameState.money += bonus;
+        gameState.totalEarned += bonus;
+        gameState.rankingScore += bonus;
+        updateUI();
+        saveGame();
+        showFloatNotif(`🍊 Laranjas usadas! +R$ ${bonus.toLocaleString()} (15% do caixa)`);
+        const cd = document.getElementById('cd-laranjas');
+        const btn = document.getElementById('btn-laranjas');
+        btn.disabled = true;
+        let t = 120;
+        cd.textContent = t + 's';
+        const iv = setInterval(() => {
+            t--;
+            cd.textContent = t + 's';
+            if (t <= 0) {
+                clearInterval(iv);
+                laranjaDisponivel = true;
+                btn.disabled = false;
+                cd.textContent = "PRONTO";
+            }
+        }, 1000);
+    }
+
+    function emendaPix() {
+        if (!emendaDisponivel) { showFloatNotif("⏳ Emenda em cooldown!"); return; }
+        emendaDisponivel = false;
+        const bonus = 5000 * gameState.prestige;
+        gameState.money += bonus;
+        gameState.totalEarned += bonus;
+        gameState.rankingScore += bonus;
+        updateUI();
+        saveGame();
+        showFloatNotif(`💳 Emenda PIX! +R$ ${bonus.toLocaleString()}`);
+        const cd = document.getElementById('cd-emenda');
+        const btn = document.getElementById('btn-emenda');
+        btn.disabled = true;
+        let t = 60;
+        cd.textContent = t + 's';
+        const iv = setInterval(() => {
+            t--;
+            cd.textContent = t + 's';
+            if (t <= 0) {
+                clearInterval(iv);
+                emendaDisponivel = true;
+                btn.disabled = false;
+                cd.textContent = "PRONTO";
+            }
+        }, 1000);
+    }
+
+    function ativarMonofone() {
+        if (!monofoneDisponivel) { showFloatNotif("⏳ Grampo em cooldown!"); return; }
+        monofoneDisponivel = false;
+        monofoneAtivo = true;
+        const btn = document.getElementById('btn-monofone');
+        const cd = document.getElementById('cd-monofone');
+        btn.disabled = true;
+        btn.style.background = '#555';
+        let t = 30;
+        cd.textContent = t + 's';
+        const iv = setInterval(() => {
+            t--;
+            cd.textContent = t + 's';
+            if (t <= 0) {
+                clearInterval(iv);
+                monofoneAtivo = false;
+                monofoneDisponivel = true;
+                btn.disabled = false;
+                btn.style.background = '';
+                cd.textContent = "PRONTO";
+                showFloatNotif("📞 Grampo desativado!");
+            }
+        }, 1000);
+        showFloatNotif("📞 Grampo ativo! +50% por clique por 30s");
+        updateUI();
+    }
+
+    // ================================================================
+    // SABOTAGEM DE RIVAIS
+    // ================================================================
+    async function executarSabotagem(tipo, custo) {
+        const sabotageCusto = gameState.specialItems['agente_duplo'] ? Math.floor(custo * 0.7) : custo;
+        if (gameState.money < sabotageCusto) { showFloatNotif(`❌ Faltam R$ ${formatMoney(sabotageCusto - gameState.money)}`); return; }
+
+        try {
+            const snap = await db.collection("users").orderBy("rankingScore", "desc").limit(10).get();
+            const rivals = [];
+            snap.forEach(doc => { if (doc.id !== currentUser) rivals.push(doc.id); });
+            if (rivals.length === 0) { showFloatNotif("❌ Nenhum rival online!"); return; }
+
+            const target = rivals[Math.floor(Math.random() * rivals.length)];
+            gameState.money -= sabotageCusto;
+            gameState.totalSabotages = (gameState.totalSabotages || 0) + 1;
+            updateMission('sabotages', 1);
+            await enviarComandoParaJogador(target, { type: 'scandal_plus40', from: currentUser });
+            updateUI();
+            saveGame();
+            checkAchievements();
+            showFloatNotif(`🚨 Denúncia enviada para ${target}! +40% escândalo nele.`);
+        } catch (e) { showFloatNotif("❌ Erro ao sabotar!"); console.error(e); }
+    }
+
+    async function enviarComandoParaJogador(targetUser, command) {
+        try {
+            await db.collection("commands").add({
+                target: targetUser,
+                ...command,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (e) { console.error("Erro ao enviar comando:", e); }
+    }
+
+    // ================================================================
+    // LISTENER DE COMANDOS (recebe sabotagens/bônus)
+    // ================================================================
+    function startAdminCommandListener() {
+        if (adminListenerUnsubscribe) adminListenerUnsubscribe();
+        const cutoff = new Date();
+        adminListenerUnsubscribe = db.collection("commands")
+            .where("target", "in", [currentUser, "ALL"])
+            .onSnapshot(snapshot => {
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === 'added') {
+                        const data = change.doc.data();
+                        const ts = data.timestamp ? data.timestamp.toDate() : new Date(0);
+                        if (ts < cutoff) return; // ignora comandos antigos
+                        processarComando(data);
+                        // Limpa o comando após processar
+                        change.doc.ref.delete().catch(() => {});
+                    }
+                });
+            });
+    }
+
+    function processarComando(cmd) {
+        if (escudoAtivo && cmd.type && cmd.type.startsWith('scandal')) {
+            escudoAtivo = false;
+            gameState.specialItems['escudo_politico'] = false;
+            showSabotageOverlay("🛡️", "ESCUDO ATIVADO!", "Sua sabotagem foi bloqueada pelo Escudo Político!");
+            saveGame();
+            return;
+        }
+        switch (cmd.type) {
+            case 'scandal_max':
+                nivelEscandalo = 100;
+                updateUI();
+                triggerScandalFreeze();
+                showSabotageOverlay("🚨", "ESCÂNDALO MÁXIMO!", `${cmd.from || 'Admin'} lotou sua barra de escândalo!`);
+                break;
+            case 'scandal_plus40':
+                nivelEscandalo = Math.min(100, nivelEscandalo + 40);
+                updateUI();
+                if (nivelEscandalo >= 100) triggerScandalFreeze();
+                showSabotageOverlay("📰", "DENÚNCIA RECEBIDA!", `${cmd.from || 'Rival'} denunciou você! +40% escândalo!`);
+                break;
+            case 'scandal_plus50':
+                nivelEscandalo = Math.min(100, nivelEscandalo + 50);
+                updateUI();
+                if (nivelEscandalo >= 100) triggerScandalFreeze();
+                showSabotageOverlay("📰", "+50% ESCÂNDALO!", `${cmd.from || 'Admin'} aumentou seu escândalo!`);
+                break;
+            case 'scandal_plus30':
+                nivelEscandalo = Math.min(100, nivelEscandalo + 30);
+                updateUI();
+                if (nivelEscandalo >= 100) triggerScandalFreeze();
+                showSabotageOverlay("📰", "+30% ESCÂNDALO!", `${cmd.from || 'Admin'} aumentou seu escândalo!`);
+                break;
+            case 'scandal_plus25':
+                nivelEscandalo = Math.min(100, nivelEscandalo + 25);
+                updateUI();
+                if (nivelEscandalo >= 100) triggerScandalFreeze();
+                showSabotageOverlay("📰", "+25% ESCÂNDALO!", `${cmd.from || 'Admin'} aumentou seu escândalo!`);
+                break;
+            case 'freeze_60':
+                aplicarCongelamento(60);
+                showSabotageOverlay("🧊", "CONGELADO 60s!", `${cmd.from || 'Admin'} congelou seus bens!`);
+                break;
+            case 'freeze_120':
+                aplicarCongelamento(120);
+                showSabotageOverlay("🧊", "CONGELADO 120s!", `${cmd.from || 'Admin'} congelou seus bens por 2 minutos!`);
+                break;
+            case 'steal_half':
+                const half = Math.floor(gameState.money / 2);
+                gameState.money -= half;
+                updateUI();
+                saveGame();
+                showSabotageOverlay("💸", "ROUBADO!", `${cmd.from || 'Admin'} roubou R$ ${formatMoney(half)} (50%)!`);
+                break;
+            case 'steal_all':
+                gameState.money = 0;
+                updateUI();
+                saveGame();
+                showSabotageOverlay("💀", "TUDO ROUBADO!", `${cmd.from || 'Admin'} zerou seu dinheiro!`);
+                break;
+            case 'reset_items':
+                gameState.purchasedItems = {};
+                buildStore();
+                startProductionCycles();
+                updateUI();
+                saveGame();
+                showSabotageOverlay("🗑️", "PROGRAMAS RESETADOS!", `${cmd.from || 'Admin'} removeu todos os seus programas!`);
+                break;
+            case 'reverse_prestige':
+                if (gameState.prestige > 1) { gameState.prestige--; updateUI(); saveGame(); }
+                showSabotageOverlay("⬇️", "PRESTIGE REDUZIDO!", `${cmd.from || 'Admin'} reduziu seu prestige!`);
+                break;
+            case 'cost_double':
+                costMultiplier = 2;
+                buildStore();
+                setTimeout(() => { costMultiplier = 1; buildStore(); }, 60000);
+                showSabotageOverlay("💹", "CUSTOS DOBRADOS!", `${cmd.from || 'Admin'} dobrou seus custos por 60s!`);
+                break;
+            case 'bonus_money_10k':
+                gameState.money += 10000;
+                gameState.rankingScore += 10000;
+                updateUI();
+                saveGame();
+                showFloatNotif("🎁 Admin te deu R$ 10.000!");
+                break;
+            case 'bonus_money_100k':
+                gameState.money += 100000;
+                gameState.rankingScore += 100000;
+                updateUI();
+                saveGame();
+                showFloatNotif("🎁 Admin te deu R$ 100.000!");
+                break;
+            case 'bonus_mult2':
+                globalMultiplier = 2;
+                showFloatNotif("🚀 Multiplicador x2 por 30s!");
+                setTimeout(() => { globalMultiplier = 1; buildStore(); }, 30000);
+                buildStore();
+                break;
+            case 'bonus_mult5':
+                globalMultiplier = 5;
+                showFloatNotif("🚀 Multiplicador x5 por 30s!");
+                setTimeout(() => { globalMultiplier = 1; buildStore(); }, 30000);
+                buildStore();
+                break;
+            case 'clear_scandal':
+                nivelEscandalo = 0;
+                updateUI();
+                showFloatNotif("✅ Admin zerou seu escândalo!");
+                break;
+            case 'unfreeze':
+                descongelar();
+                showFloatNotif("🔓 Admin te descongelou!");
+                break;
+            case 'global_milagre':
+                globalMultiplier = 3;
+                showEventTicker("🌟 MILAGRE ECONÔMICO! Produção x3 por 30s!", "positive");
+                setTimeout(() => { globalMultiplier = 1; hideEventTicker(); }, 30000);
+                break;
+            case 'global_crise':
+                globalMultiplier = 0.5;
+                showEventTicker("📉 CRISE ECONÔMICA! Produção ÷2 por 30s!", "negative");
+                setTimeout(() => { globalMultiplier = 1; hideEventTicker(); }, 30000);
+                break;
+            case 'global_operacao':
+                nivelEscandalo = Math.min(100, nivelEscandalo + 30);
+                updateUI();
+                if (nivelEscandalo >= 100) triggerScandalFreeze();
+                showEventTicker("🚔 OPERAÇÃO POLICIAL! +30% escândalo para todos!", "negative");
+                break;
+            case 'global_eleicao':
+                gameState.rankingScore = gameState.money;
+                saveGame();
+                showEventTicker("🗳️ ELEIÇÃO SURPRESA! Rankings resetados!", "positive");
+                break;
+        }
+    }
+
+    // ================================================================
+    // CONGELAMENTO
+    // ================================================================
+    function triggerScandalFreeze() {
+        if (processoCongelado) return;
+        aplicarCongelamento(60);
+        showSabotageOverlay("🧊", "STF CONGELOU SEUS BENS!", "Escândalo atingiu 100%! Congelado por 60s!");
+    }
+
+    function aplicarCongelamento(seconds) {
+        if (freezeTimer) clearInterval(freezeTimer);
+        processoCongelado = true;
+        freezeCountdown = seconds;
+        document.getElementById('freeze-overlay').classList.remove('hidden');
+        document.getElementById('freeze-countdown').textContent = seconds;
+        freezeTimer = setInterval(() => {
+            freezeCountdown--;
+            document.getElementById('freeze-countdown').textContent = freezeCountdown;
+            if (freezeCountdown <= 0) descongelar();
+        }, 1000);
+    }
+
+    function descongelar() {
+        if (freezeTimer) clearInterval(freezeTimer);
+        freezeTimer = null;
+        processoCongelado = false;
+        freezeCountdown = 0;
+        nivelEscandalo = 0;
+        document.getElementById('freeze-overlay').classList.add('hidden');
+        updateUI();
+        showFloatNotif("🔓 Processo descongelado!");
+    }
+
+    // ================================================================
+    // ENGINE DE ESCÂNDALO AUTOMÁTICO
+    // ================================================================
+    function startScandalEngine() {
+        if (scandalInterval) clearInterval(scandalInterval);
+        scandalInterval = setInterval(() => {
+            if (foroAtivo || processoCongelado) return;
+            // Escândalo sobe lentamente com o tempo
+            const totalItems = Object.values(gameState.purchasedItems).reduce((a, b) => a + b, 0);
+            const rise = 0.1 + totalItems * 0.005;
+            nivelEscandalo = Math.min(100, nivelEscandalo + rise);
+            if (nivelEscandalo >= 100) triggerScandalFreeze();
+            updateUI();
+        }, 5000);
+    }
+
+    // ================================================================
+    // ENGINE DE EVENTOS ALEATÓRIOS
+    // ================================================================
+    function startEventEngine() {
+        setInterval(() => {
+            const events = [
+                { chance: 0.15, fn: () => { globalMultiplier = 2; showEventTicker("🚀 MILAGRE ECONÔMICO: Produção x2 por 15s!", "positive"); setTimeout(() => { globalMultiplier = 1; hideEventTicker(); }, 15000); } },
+                { chance: 0.10, fn: () => { globalMultiplier = 0.5; showEventTicker("📉 RECESSÃO: Produção ÷2 por 10s!", "negative"); setTimeout(() => { globalMultiplier = 1; hideEventTicker(); }, 10000); } },
+                { chance: 0.08, fn: () => { if (!foroAtivo) { nivelEscandalo = Math.min(100, nivelEscandalo + 20); updateUI(); showEventTicker("📰 VAZAMENTO NA IMPRENSA: +20% escândalo!", "negative"); if (nivelEscandalo >= 100) triggerScandalFreeze(); } } },
+                { chance: 0.07, fn: () => { const bonus = Math.floor(gameState.money * 0.05); gameState.money += bonus; gameState.rankingScore += bonus; updateUI(); showEventTicker(`💵 DIVIDENDOS: +R$ ${formatMoney(bonus)} (5% do caixa)!`, "positive"); setTimeout(hideEventTicker, 8000); } },
+                { chance: 0.05, fn: () => { costMultiplier = 0.5; showEventTicker("🏷️ LIQUIDAÇÃO: Itens 50% mais baratos por 30s!", "positive"); buildStore(); setTimeout(() => { costMultiplier = 1; buildStore(); hideEventTicker(); }, 30000); } },
+            ];
+            const r = Math.random();
+            let acc = 0;
+            for (const ev of events) {
+                acc += ev.chance;
+                if (r < acc) { ev.fn(); break; }
+            }
+        }, 30000);
+    }
+
+    function showEventTicker(msg, type) {
+        const ticker = document.getElementById('event-ticker');
+        ticker.textContent = msg;
+        ticker.className = `event-ticker-active event-${type}`;
+    }
+    function hideEventTicker() {
+        const ticker = document.getElementById('event-ticker');
+        ticker.className = 'ticker-hidden';
+    }
+
+    // ================================================================
+    // PRESTIGE
+    // ================================================================
+    function triggerPrestige() {
+        const required = 100000 * gameState.prestige;
+        if (gameState.money < required) {
+            showFloatNotif(`❌ Precisa de R$ ${formatMoney(required)} para Prestige!`);
+            return;
+        }
+        if (!confirm(`Realizar PRESTIGE?\n\nVocê voltará ao início, mas terá +15% de lucro permanente.\nCusto: R$ ${required.toLocaleString()}`)) return;
+        gameState.prestige++;
+        gameState.money = 150;
+        gameState.purchasedItems = {};
+        nivelEscandalo = 0;
+        buildStore();
+        updateUI();
+        startProductionCycles();
+        saveGame();
+        showFloatNotif(`⭐ PRESTIGE ${gameState.prestige}! +15% lucro permanente!`);
+    }
+
+    // ================================================================
+    // RANKING
+    // ================================================================
+    function switchRankTab(tab, btn) {
+        currentRankTab = tab;
+        document.querySelectorAll('.rank-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderLeaderboard();
+    }
+
+    async function renderLeaderboard() {
+        const list = document.getElementById('leaderboard-list');
+        list.innerHTML = "<li style='color:#736d8c;font-size:0.5rem;padding:10px;'>Carregando...</li>";
+        try {
+            const field = currentRankTab === 'money' ? 'money' : currentRankTab === 'prestige' ? 'prestige' : 'rankingScore';
+            const snapshot = await db.collection("users").orderBy(field, "desc").limit(15).get();
             list.innerHTML = "";
             let rank = 1;
             snapshot.forEach(doc => {
                 const data = doc.data();
+                const isMe = doc.id === currentUser;
                 const li = document.createElement('li');
-                li.style = "display:flex; justify-content:space-between; padding:8px; background:#090514; margin-bottom:5px; border:1px solid #332759;";
-                li.innerHTML = `<span>#${rank} ${data.username}</span> <span>R$ ${data.rankingScore.toLocaleString()}</span>`;
+                li.className = isMe ? 'rank-me' : '';
+                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+                const val = currentRankTab === 'money' ? `R$ ${formatMoney(data.money || 0)}` :
+                            currentRankTab === 'prestige' ? `⭐ ${data.prestige || 1}` :
+                            `R$ ${formatMoney(data.rankingScore || 0)}`;
+                li.innerHTML = `<span>${medal} ${data.username || doc.id}</span><span>${val}</span>`;
                 list.appendChild(li);
                 rank++;
             });
-        }
+            if (list.innerHTML === "") list.innerHTML = "<li style='color:#736d8c;font-size:0.5rem;padding:10px;'>Nenhum jogador ainda.</li>";
+        } catch (e) { list.innerHTML = "<li style='color:#ff3366;font-size:0.5rem;padding:10px;'>Erro ao carregar!</li>"; }
+    }
 
-        function toggleMissionsModal() { document.getElementById('missions-modal').classList.toggle('hidden'); }
-        function toggleAchievementsModal() { document.getElementById('achievements-modal').classList.toggle('hidden'); }
-
-        function triggerPrestige() {
-            const required = 100000 * gameState.prestige;
-            if(gameState.money >= required) {
-                if(confirm(`Deseja realizar o PRESTIGE? Você voltará ao início, mas terá +15% de lucro permanente. Custo: R$ ${required.toLocaleString()}`)) {
-                    gameState.prestige++;
-                    gameState.money = 150;
-                    gameState.purchasedItems = {};
-                    buildStore();
-                    updateUI();
-                    startProductionCycles();
-                    saveGame();
-                }
-            } else {
-                alert(`Você precisa de R$ ${required.toLocaleString()} para o próximo Prestige!`);
-            }
+    // ================================================================
+    // SAVE / LOAD
+    // ================================================================
+    function saveGame() {
+        if (currentUser && !isGuest) {
+            db.collection("users").doc(currentUser).set({
+                ...gameState,
+                nivelEscandalo,
+                username: currentUser,
+                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(e => console.error("Erro ao salvar:", e));
         }
+    }
 
-        function abafarCaso() {
-            if(gameState.money >= 1500) {
-                gameState.money -= 1500;
-                nivelEscandalo = Math.max(0, nivelEscandalo - 30);
-                updateUI();
-            }
-        }
+    function logout() {
+        saveGame();
+        if (adminListenerUnsubscribe) adminListenerUnsubscribe();
+        location.reload();
+    }
 
-        function ativarPedirVista() {
-            if(!vistaDisponivel) return;
-            vistaDisponivel = false;
-            processoCongelado = true;
-            document.getElementById('btn-pedir-vista').style.background = "#555";
-            document.getElementById('btn-pedir-vista').textContent = "⚖️ VISTA PEDIDA";
-            setTimeout(() => {
-                processoCongelado = false;
-                document.getElementById('btn-pedir-vista').style.background = "#e6b800";
-                document.getElementById('btn-pedir-vista').textContent = "⚖️ PEDIR VISTA (PRONTO)";
-                vistaDisponivel = true;
-            }, 30000);
-        }
+    // ================================================================
+    // OVERLAYS E NOTIFICAÇÕES
+    // ================================================================
+    function showFloatNotif(txt) {
+        const el = document.getElementById('float-notif');
+        el.textContent = txt;
+        el.classList.remove('hidden');
+        el.classList.add('float-notif-show');
+        setTimeout(() => { el.classList.remove('float-notif-show'); el.classList.add('hidden'); }, 2500);
+    }
 
-        function comprarMalaFalsa() {
-            if(gameState.money >= 1100) {
-                gameState.money -= 1100;
-                nivelEscandalo = Math.max(0, nivelEscandalo - 15);
-                updateUI();
-            }
-        }
+    function showSabotageOverlay(icon, title, desc) {
+        const ov = document.getElementById('sabotage-overlay');
+        document.getElementById('sabotage-icon').textContent = icon;
+        document.getElementById('sabotage-title').textContent = title;
+        document.getElementById('sabotage-desc').textContent = desc;
+        ov.classList.remove('hidden');
+        setTimeout(() => ov.classList.add('hidden'), 3500);
+    }
 
-        function ativarMonofone() {
-            if(monofoneAtivo) return;
-            monofoneAtivo = true;
-            document.getElementById('btn-monofone').style.background = "#555";
-            setTimeout(() => {
-                monofoneAtivo = false;
-                document.getElementById('btn-monofone').style.background = "#00ffff";
-            }, 10000);
-        }
+    // ================================================================
+    // MODAIS (toggle)
+    // ================================================================
+    function toggleRankingModal() {
+        const modal = document.getElementById('ranking-modal');
+        modal.classList.toggle('hidden');
+        if (!modal.classList.contains('hidden')) renderLeaderboard();
+    }
+    function toggleMissionsModal() {
+        document.getElementById('missions-modal').classList.toggle('hidden');
+    }
+    function toggleAchievementsModal() {
+        document.getElementById('achievements-modal').classList.toggle('hidden');
+    }
+    function toggleStoreModal() {
+        const modal = document.getElementById('store-modal');
+        modal.classList.toggle('hidden');
+        if (!modal.classList.contains('hidden')) renderSpecialStore();
+    }
+    function toggleStatsModal() {
+        const modal = document.getElementById('stats-modal');
+        modal.classList.toggle('hidden');
+        if (!modal.classList.contains('hidden')) renderStats();
+    }
 
-        function logout() {
-            saveGame();
-            location.reload();
+    // ================================================================
+    // PAINEL ADMIN
+    // ================================================================
+    function promptAdminLogin() {
+        const pw = prompt("Senha do Administrador:");
+        if (pw === ADMIN_PASSWORD) {
+            isAdmin = true;
+            document.getElementById('admin-panel').classList.remove('hidden');
+            refreshAdminPlayerList();
+            addAdminLog("🔐 Painel Admin aberto.");
+        } else if (pw !== null) {
+            alert("Senha incorreta!");
         }
+    }
+
+    function closeAdminPanel(e) {
+        if (!e || e.target.id === 'admin-panel') {
+            document.getElementById('admin-panel').classList.add('hidden');
+        }
+    }
+
+    async function refreshAdminPlayerList() {
+        const sel = document.getElementById('admin-target-select');
+        sel.innerHTML = '<option value="ALL">👥 TODOS OS JOGADORES</option>';
+        try {
+            const snap = await db.collection("users").orderBy("rankingScore", "desc").limit(50).get();
+            snap.forEach(doc => {
+                const opt = document.createElement('option');
+                opt.value = doc.id;
+                opt.textContent = `👤 ${doc.id} (R$ ${formatMoney(doc.data().money || 0)})`;
+                sel.appendChild(opt);
+            });
+            addAdminLog(`✅ Lista atualizada: ${snap.size} jogadores.`);
+        } catch (e) { addAdminLog("❌ Erro ao carregar jogadores."); }
+    }
+
+    async function adminAction(type) {
+        const target = document.getElementById('admin-target-select').value;
+        if (target === 'ALL') {
+            try {
+                const snap = await db.collection("users").get();
+                let count = 0;
+                const batch = db.batch();
+                snap.forEach(doc => {
+                    const cmdRef = db.collection("commands").doc();
+                    batch.set(cmdRef, { target: doc.id, type, from: 'Admin', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+                    count++;
+                });
+                await batch.commit();
+                addAdminLog(`⚡ [${type}] enviado para TODOS (${count} jogadores)`);
+            } catch (e) { addAdminLog(`❌ Erro: ${e.message}`); }
+        } else {
+            await enviarComandoParaJogador(target, { type, from: 'Admin' });
+            addAdminLog(`⚡ [${type}] enviado para ${target}`);
+        }
+    }
+
+    async function adminGlobalEvent(eventType) {
+        try {
+            const snap = await db.collection("users").get();
+            const batch = db.batch();
+            snap.forEach(doc => {
+                const cmdRef = db.collection("commands").doc();
+                batch.set(cmdRef, {
+                    target: doc.id,
+                    type: `global_${eventType}`,
+                    from: 'Admin',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            });
+            await batch.commit();
+            addAdminLog(`🌎 Evento Global [${eventType}] disparado para todos!`);
+        } catch (e) { addAdminLog(`❌ Erro: ${e.message}`); }
+    }
+
+    function addAdminLog(msg) {
+        const log = document.getElementById('admin-log');
+        if (!log) return;
+        const entry = document.createElement('div');
+        entry.className = 'admin-log-entry';
+        entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        log.prepend(entry);
+        if (log.children.length > 30) log.removeChild(log.lastChild);
+    }
     </script>
 </div>
 </body>
