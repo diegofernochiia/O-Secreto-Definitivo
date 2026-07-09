@@ -443,6 +443,15 @@
         totalSabotages: 0, specialItems: {}
     };
 
+    // Variáveis para guardar o ranking na memória por 60 segundos
+let rankingCache = {
+    score: { list: null, timestamp: 0 },
+    money: { list: null, timestamp: 0 },
+    prestige: { list: null, timestamp: 0 }
+};
+const TEMPO_CACHE_RANKING = 60000; // 60 segundos em milissegundos
+
+
     let globalMultiplier = 1;
     let costMultiplier = 1;
     let nivelEscandalo = 25;
@@ -991,16 +1000,18 @@ updateUI();
     }
 
     async function executarSabotagemGlobal(type) {
-        try {
-            const snap = await db.collection("users").get();
-            snap.forEach(doc => {
-                if (doc.id !== currentUser) {
-                    enviarComandoParaJogador(doc.id, { type: 'scandal_plus30', from: currentUser });
-                }
-            });
-            showFloatNotif("📜 CPI Falsa! +30% escândalo em todos os rivais!");
-        } catch (e) { console.error(e); }
-    }
+    try {
+        // Em vez de ler todos os usuários do banco, sabota apenas os top 15 ativos
+        const snap = await db.collection("users").orderBy("rankingScore", "desc").limit(15).get();
+        snap.forEach(doc => {
+            if (doc.id !== currentUser) {
+                enviarComandoParaJogador(doc.id, { type: 'scandal_plus30', from: currentUser });
+            }
+        });
+        showFloatNotif("📜 CPI Falsa! +30% escândalo nos 15 melhores rivais!");
+    } catch (e) { console.error(e); }
+}
+
 
     // ================================================================
     // ESTATÍSTICAS
@@ -1479,29 +1490,61 @@ updateUI();
     }
 
     async function renderLeaderboard() {
-        const list = document.getElementById('leaderboard-list');
-        list.innerHTML = "<li style='color:#736d8c;font-size:0.5rem;padding:10px;'>Carregando...</li>";
-        try {
-            const field = currentRankTab === 'money' ? 'money' : currentRankTab === 'prestige' ? 'prestige' : 'rankingScore';
-            const snapshot = await db.collection("users").orderBy(field, "desc").limit(15).get();
-            list.innerHTML = "";
-            let rank = 1;
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const isMe = doc.id === currentUser;
-                const li = document.createElement('li');
-                li.className = isMe ? 'rank-me' : '';
-                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
-                const val = currentRankTab === 'money' ? `R$ ${formatMoney(data.money || 0)}` :
-                            currentRankTab === 'prestige' ? `⭐ ${data.prestige || 1}` :
-                            `R$ ${formatMoney(data.rankingScore || 0)}`;
-                li.innerHTML = `<span>${medal} ${data.username || doc.id}</span><span>${val}</span>`;
-                list.appendChild(li);
-                rank++;
-            });
-            if (list.innerHTML === "") list.innerHTML = "<li style='color:#736d8c;font-size:0.5rem;padding:10px;'>Nenhum jogador ainda.</li>";
-        } catch (e) { list.innerHTML = "<li style='color:#ff3366;font-size:0.5rem;padding:10px;'>Erro ao carregar!</li>"; }
+    const list = document.getElementById('leaderboard-list');
+    list.innerHTML = "<li style='color:#736d8c;font-size:0.5rem;padding:10px;'>Carregando...</li>";
+    
+    const agora = Date.now();
+    const tab = currentRankTab; // 'score', 'money' ou 'prestige'
+    
+    // Se temos os dados salvos e faz menos de 60 segundos, usamos o cache (Leitura Zero!)
+    if (rankingCache[tab].list && (agora - rankingCache[tab].timestamp < TEMPO_CACHE_RANKING)) {
+        desenharLeaderboard(rankingCache[tab].list);
+        return;
     }
+
+    try {
+        const field = tab === 'money' ? 'money' : tab === 'prestige' ? 'prestige' : 'rankingScore';
+        const snapshot = await db.collection("users").orderBy(field, "desc").limit(15).get();
+        
+        const listaJogadores = [];
+        snapshot.forEach(doc => {
+            listaJogadores.push({ id: doc.id, ...doc.data() });
+        });
+        
+        // Atualiza o cache local
+        rankingCache[tab].list = listaJogadores;
+        rankingCache[tab].timestamp = agora;
+        
+        desenharLeaderboard(listaJogadores);
+    } catch (e) { 
+        list.innerHTML = "<li style='color:#ff3366;font-size:0.5rem;padding:10px;'>Erro ao carregar!</li>"; 
+    }
+}
+
+// Nova função auxiliar para renderizar a lista na tela
+function desenharLeaderboard(dadosJogadores) {
+    const list = document.getElementById('leaderboard-list');
+    list.innerHTML = "";
+    let rank = 1;
+    
+    dadosJogadores.forEach(data => {
+        const isMe = data.id === currentUser;
+        const li = document.createElement('li');
+        li.className = isMe ? 'rank-me' : '';
+        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+        const val = currentRankTab === 'money' ? `R$ ${formatMoney(data.money || 0)}` :
+                    currentRankTab === 'prestige' ? `⭐ ${data.prestige || 1}` :
+                    `R$ ${formatMoney(data.rankingScore || 0)}`;
+        li.innerHTML = `<span>${medal} ${data.username || data.id}</span><span>${val}</span>`;
+        list.appendChild(li);
+        rank++;
+    });
+    
+    if (list.innerHTML === "") {
+        list.innerHTML = "<li style='color:#736d8c;font-size:0.5rem;padding:10px;'>Nenhum jogador ainda.</li>";
+    }
+}
+
 
     // ================================================================
     // SAVE / LOAD
