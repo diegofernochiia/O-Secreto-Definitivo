@@ -443,6 +443,11 @@
         totalSabotages: 0, specialItems: {}
     };
 
+    // COLE ESTAS TRÊS LINHAS EXATAMENTE AQUI:
+    let saveTimeout = null;
+    let lastSaveTime = 0;
+    const COOLDOWN_SALVAMENTO = 5000; 
+
     let globalMultiplier = 1;
     let costMultiplier = 1;
     let nivelEscandalo = 25;
@@ -1496,21 +1501,56 @@
     // ================================================================
     // SAVE / LOAD
     // ================================================================
-    function saveGame() {
-        if (currentUser && !isGuest) {
-            db.collection("users").doc(currentUser).set({
-                ...gameState,
-                nivelEscandalo,
-                username: currentUser,
-                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-            }).catch(e => console.error("Erro ao salvar:", e));
+        // ================================================================
+    // SAVE / LOAD
+    // ================================================================
+    function saveGame(forcar = false) {
+        if (!currentUser || isGuest) return;
+
+        const agora = Date.now();
+
+        if (forcar) {
+            clearTimeout(saveTimeout);
+            executarSalvamentoReal();
+            return;
+        }
+
+        if (agora - lastSaveTime < COOLDOWN_SALVAMENTO) {
+            if (!saveTimeout) {
+                saveTimeout = setTimeout(() => {
+                    executarSalvamentoReal();
+                }, COOLDOWN_SALVAMENTO - (agora - lastSaveTime));
+            }
+        } else {
+            executarSalvamentoReal();
         }
     }
 
+    function executarSalvamentoReal() {
+        saveTimeout = null;
+        lastSaveTime = Date.now();
+
+        db.collection("users").doc(currentUser).set({
+            ...gameState,
+            nivelEscandalo,
+            username: currentUser,
+            lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => console.log("Progresso enviado com sucesso ao Firestore!"))
+        .catch(e => console.error("Erro ao salvar no Firestore:", e));
+    }
+
     function logout() {
-        saveGame();
+        saveGame(true); // Força o salvamento imediato ignorando o cooldown de 5s
+        
         if (adminListenerUnsubscribe) adminListenerUnsubscribe();
-        location.reload();
+        
+        showFloatNotif("Salvando progresso e saindo...");
+        
+        // Aguarda 1 segundo para garantir que a gravação finalizou antes de atualizar
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
     }
 
     // ================================================================
