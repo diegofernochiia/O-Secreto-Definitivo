@@ -531,53 +531,88 @@
         document.getElementById('btn-auth-text').textContent = isLogin ? 'ENTRAR NO JOGO' : 'CRIAR CONTA';
     }
 
-    async function confirmAuth() {
-        const username = document.getElementById('username-input').value.trim();
-        const password = document.getElementById('password-input').value;
-        const msg = document.getElementById('auth-message');
-        const isLogin = document.getElementById('tab-login').classList.contains('active');
-        if (!username || !password) { msg.textContent = "Preencha todos os campos!"; return; }
-        if (username.length < 3) { msg.textContent = "Usuário muito curto (mín. 3 chars)!"; return; }
-        msg.textContent = "Verificando...";
-        const userRef = db.collection("users").doc(username);
-        try {
-            const doc = await userRef.get();
-            if (isLogin) {
-                if (doc.exists && doc.data().password === password) {
-                    currentUser = username;
-                    const data = doc.data();
-                    gameState = {
-                        money: data.money || 150,
-                        prestige: data.prestige || 1,
-                        rankingScore: data.rankingScore || 150,
-                        purchasedItems: data.purchasedItems || {},
-                        totalClicks: data.totalClicks || 0,
-                        totalEarned: data.totalEarned || 0,
-                        totalSabotages: data.totalSabotages || 0,
-                        specialItems: data.specialItems || {},
-                        password: data.password
-                    };
-                    nivelEscandalo = data.nivelEscandalo || 25;
-                    localStorage.setItem('bs_last_user', username);
-                    startGame();
-                } else { msg.textContent = "Usuário ou senha incorretos!"; }
-            } else {
-                if (doc.exists) { msg.textContent = "Usuário já existe!"; }
-                else {
-                    const newState = {
-                        username, password,
-                        money: 150, prestige: 1, rankingScore: 150,
-                        purchasedItems: {}, totalClicks: 0, totalEarned: 0,
-                        totalSabotages: 0, specialItems: {}, nivelEscandalo: 25
-                    };
-                    await userRef.set(newState);
-                    msg.style.color = "#00ff66";
-                    msg.textContent = "Registrado! Clique em ENTRAR.";
-                    switchAuthTab('login');
-                }
+    function loadGameData(data) {
+    // Restaura o estado principal
+    gameState = {
+        money: data.money || 150,
+        prestige: data.prestige || 1,
+        rankingScore: data.rankingScore || 150,
+        purchasedItems: data.purchasedItems || {},
+        totalClicks: data.totalClicks || 0,
+        totalEarned: data.totalEarned || 0,
+        totalSabotages: data.totalSabotages || 0,
+        specialItems: data.specialItems || {},
+        password: data.password
+    };
+    
+    // Restaura as variáveis de ambiente e bônus
+    nivelEscandalo = data.nivelEscandalo || 25;
+    globalMultiplier = data.globalMultiplier || 1;
+    costMultiplier = data.costMultiplier || 1;
+    monofoneAtivo = data.monofoneAtivo || false;
+    malaFalsaAtiva = data.malaFalsaAtiva || false;
+    foroAtivo = data.foroAtivo || false;
+    escudoAtivo = data.escudoAtivo || false;
+    
+    // Restaura conquistas e missões
+    if (data.unlockedAchievements) unlockedAchievements = new Set(data.unlockedAchievements);
+    missionProgress = data.missionProgress || {};
+    missionCompleted = data.missionCompleted || {};
+    
+    localStorage.setItem('bs_last_user', currentUser);
+}
+
+
+  async function confirmAuth() {
+    const username = document.getElementById('username-input').value.trim();
+    const password = document.getElementById('password-input').value;
+    const msg = document.getElementById('auth-message');
+    const isLogin = document.getElementById('tab-login').classList.contains('active');
+    
+    if (!username || !password) { msg.textContent = "Preencha todos os campos!"; return; }
+    if (username.length < 3) { msg.textContent = "Usuário muito curto (mín. 3 chars)!"; return; }
+    
+    msg.textContent = "Verificando...";
+    const userRef = db.collection("users").doc(username);
+    
+    try {
+        const doc = await userRef.get();
+        if (isLogin) {
+            // Lógica de LOGIN
+            if (doc.exists && doc.data().password === password) {
+                currentUser = username;
+                loadGameData(doc.data()); // Carrega todos os dados salvos
+                startGame();
+            } else { 
+                msg.textContent = "Usuário ou senha incorretos!"; 
             }
-        } catch (e) { msg.textContent = "Erro de conexão! Tente novamente."; console.error(e); }
+        } else {
+            // Lógica de REGISTRO
+            if (doc.exists) { 
+                msg.textContent = "Usuário já existe!"; 
+            } else {
+                const newState = {
+                    username, password,
+                    money: 150, prestige: 1, rankingScore: 150,
+                    purchasedItems: {}, totalClicks: 0, totalEarned: 0,
+                    totalSabotages: 0, specialItems: {}, nivelEscandalo: 25,
+                    globalMultiplier: 1, costMultiplier: 1,
+                    monofoneAtivo: false, malaFalsaAtiva: false,
+                    foroAtivo: false, escudoAtivo: false,
+                    unlockedAchievements: [], missionProgress: {}, missionCompleted: {}
+                };
+                await userRef.set(newState);
+                msg.style.color = "#00ff66";
+                msg.textContent = "Registrado! Clique em ENTRAR.";
+                switchAuthTab('login');
+            }
+        }
+    } catch (e) { 
+        msg.textContent = "Erro de conexão! Tente novamente."; 
+        console.error(e); 
     }
+}
+
 
     function playAsGuest() {
         currentUser = "Convidado_" + Math.floor(Math.random() * 9999);
@@ -1497,21 +1532,32 @@
     // SAVE / LOAD
     // ================================================================
     function saveGame() {
-        if (currentUser && !isGuest) {
-            db.collection("users").doc(currentUser).set({
-                ...gameState,
-                nivelEscandalo,
-                username: currentUser,
-                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-            }).catch(e => console.error("Erro ao salvar:", e));
-        }
+    if (currentUser && !isGuest) {
+        db.collection("users").doc(currentUser).set({
+            // Dados básicos (dinheiro, itens, prestige)
+            ...gameState,
+            
+            // Variáveis de estado críticas (o que estava faltando!)
+            nivelEscandalo,
+            globalMultiplier,
+            costMultiplier,
+            monofoneAtivo,
+            malaFalsaAtiva,
+            foroAtivo,
+            escudoAtivo,
+            
+            // Progresso de Conquistas e Missões
+            unlockedAchievements: Array.from(unlockedAchievements),
+            missionProgress,
+            missionCompleted,
+            
+            // Metadados
+            username: currentUser,
+            lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(e => console.error("Erro ao salvar:", e));
     }
+}
 
-    function logout() {
-        saveGame();
-        if (adminListenerUnsubscribe) adminListenerUnsubscribe();
-        location.reload();
-    }
 
     // ================================================================
     // OVERLAYS E NOTIFICAÇÕES
