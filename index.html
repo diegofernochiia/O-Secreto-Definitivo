@@ -589,21 +589,29 @@
     // INÍCIO DO JOGO
     // ================================================================
     function startGame() {
-        document.getElementById('splash-screen').classList.add('hidden');
-        document.getElementById('auth-modal').classList.add('hidden');
-        document.getElementById('game-screen').classList.remove('hidden');
-        document.getElementById('display-username').textContent = currentUser;
-        updateUI();
-        buildStore();
-        startProductionCycles();
-        startEventEngine();
-        startScandalEngine();
-        renderMissions();
-        renderAchievements();
-        renderSpecialStore();
-        startRpsCounter();
-        if (!isGuest) startAdminCommandListener();
-    }
+    document.getElementById('splash-screen').classList.add('hidden');
+    document.getElementById('auth-modal').classList.add('hidden');
+    document.getElementById('game-screen').classList.remove('hidden');
+    document.getElementById('display-username').textContent = currentUser;
+    updateUI();
+    buildStore();
+    startProductionCycles();
+    startEventEngine();
+    startScandalEngine();
+    renderMissions();
+    renderAchievements();
+    renderSpecialStore();
+    startRpsCounter();
+    if (!isGuest) startAdminCommandListener();
+
+    // ADICIONE ESTA LINHA AQUI:
+    // Salva no banco de dados a cada 30 segundos (reduz o uso em até 99%)
+    setInterval(() => {
+        saveGame();
+        showFloatNotif("💾 Progresso salvo!");
+    }, 30000); 
+}
+
 
     // ================================================================
     // CLIQUE PRINCIPAL
@@ -631,17 +639,18 @@
             document.getElementById('combo-count').textContent = comboCount;
         }
 
-        gameState.money += gain;
-        gameState.totalEarned += gain;
-        gameState.totalClicks++;
-        gameState.rankingScore += gain;
+       gameState.money += gain;
+gameState.totalEarned += gain;
+gameState.totalClicks++;
+gameState.rankingScore += gain;
 
-        updateMission('clicks', 1);
-        updateMission('earned', gain);
-        checkAchievements();
-        updateUI();
-        saveGame();
-        showFloatNotif(`+R$ ${gain.toLocaleString()}`);
+updateMission('clicks', 1);
+updateMission('earned', gain);
+checkAchievements();
+updateUI();
+// saveGame(); // Removido para economizar requisições
+showFloatNotif(`+R$ ${gain.toLocaleString()}`);
+
 
         // Escândalo sobe levemente ao clicar (risco político)
         if (!foroAtivo && Math.random() < 0.02) {
@@ -767,11 +776,12 @@
                         if (count >= 10 && (item.id === 'mais_medicos' || item.id === 'pac' || item.id === 'petrobras' || item.id === 'banco_central')) bonusMult = 3;
                         const prod = Math.floor(item.baseProduce * count * (1 + (gameState.prestige - 1) * 0.15) * globalMultiplier * caixaDoisBonus * bonusMult);
                         gameState.money += prod;
-                        gameState.totalEarned += prod;
-                        gameState.rankingScore += prod;
-                        updateMission('earned', prod);
-                        updateUI();
-                        saveGame();
+gameState.totalEarned += prod;
+gameState.rankingScore += prod;
+updateMission('earned', prod);
+updateUI();
+// saveGame(); // Removido para economizar requisições
+
                     }
                     const el = document.getElementById(`progress-${item.id}`);
                     if (el) el.style.width = progress + '%';
@@ -1496,22 +1506,21 @@
     // ================================================================
     // SAVE / LOAD
     // ================================================================
-    function saveGame() {
-        if (currentUser && !isGuest) {
-            db.collection("users").doc(currentUser).set({
-                ...gameState,
-                nivelEscandalo,
-                username: currentUser,
-                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-            }).catch(e => console.error("Erro ao salvar:", e));
-        }
-    }
+  function saveGame() {
+    // Salva localmente no navegador (instantâneo e sem custos de cota)
+    localStorage.setItem('bs_local_state', JSON.stringify({ gameState, nivelEscandalo }));
 
-    function logout() {
-        saveGame();
-        if (adminListenerUnsubscribe) adminListenerUnsubscribe();
-        location.reload();
+    // Só envia para o Firebase se o usuário estiver logado e não for convidado
+    if (currentUser && !isGuest) {
+        db.collection("users").doc(currentUser).set({
+            ...gameState,
+            nivelEscandalo,
+            username: currentUser,
+            lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(e => console.error("Erro ao salvar no Firestore:", e));
     }
+}
+
 
     // ================================================================
     // OVERLAYS E NOTIFICAÇÕES
